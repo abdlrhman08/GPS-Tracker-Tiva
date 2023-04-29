@@ -1,3 +1,10 @@
 *.axf
 *.lnp
 *.map
+*.o
+*.d
+*.crf
+*.htm
+*.dep
+*.bak
+*.lst

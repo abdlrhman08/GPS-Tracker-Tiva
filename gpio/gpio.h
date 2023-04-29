@@ -6,7 +6,7 @@
 #define DEN 0x51C
 #define DIR 0x400
 #define LOCK 0x520
-#define COMMIT 524
+#define COMMIT 0x524
 #define DATA 0x3FC
 
 typedef enum {
