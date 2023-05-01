@@ -1,3 +1,3 @@
-# GPIO Interfacing with TIVA tm4c123gxl
+# GPS Tracker using Tiva tm4c123gxl
 
-Very basic API to interface with GPIO ports on TIVA Launchpad
+This embedded module tracks your location using the gps module and parses all information it can from the NMEA Message, like time, date and location
