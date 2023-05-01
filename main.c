@@ -2,11 +2,16 @@
 
 #include "gpio/gpio.h"
 #include "uart/UART.h"
+#include "gps/gps.h"
 #include "utils.h"
 
 void SystemInit() {}
 	
 int main() {
+	INFO GPSInfo;
+	
+	char* search = "Searching for satellites\n";
+	
 	initPort(PortF);
 	UART0_Init();
 	
@@ -26,13 +31,20 @@ int main() {
 	delay(10000);
 	
 	while(1) {
-		char str[50];
-		UART1_ReadString(str, '\n');
+		char buffer[80] = {0} ;
+		char output[40];
+		readGPS(buffer);
+		UART0_WriteString(buffer);
 		
-		str[18] = '\n';
-		str[19] = '\0';
+		if(parseGPSData(buffer, &GPSInfo.latitude, &GPSInfo.longitude, &GPSInfo.time, &GPSInfo.speed) == 0) {
+			char formattedTime[15];
+			//sprintf(formattedTime, "%i:%i:%i\n",  3, 1000, 100);
+			UART0_WriteString("555");
+			continue;
+		} 
+		
 		delay(25000);
-		UART0_WriteString(str);
+		UART0_WriteString(search);
 		pinHigh(PortF, 3);
 		delay(150000);
 		pinLow(PortF, 3);

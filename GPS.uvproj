@@ -420,6 +420,11 @@
               <FileType>5</FileType>
               <FilePath>.\utils.h</FilePath>
             </File>
+            <File>
+              <FileName>utils.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\utils.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -459,6 +464,21 @@
               <FileName>tm4c123gh6pm.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\uart\tm4c123gh6pm.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>gps</GroupName>
+          <Files>
+            <File>
+              <FileName>gps.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\gps\gps.c</FilePath>
+            </File>
+            <File>
+              <FileName>gps.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\gps\gps.h</FilePath>
             </File>
           </Files>
         </Group>
