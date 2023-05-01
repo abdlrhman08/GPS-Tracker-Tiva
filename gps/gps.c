@@ -42,12 +42,16 @@ int parseGPSData(char* gpsString, float* latitude, float* longitude, int* time, 
 			{
         // Convert latitude from degrees and minutes to decimal degrees
 				
+				
 				char degree1[3], minute1[9];
+				
+			/*
         strncpy(degree1, token, 2);
         strncpy(minute1, token + 2, 8);
         degree1[2] = '\0';
         minute1[8] = '\0';
-        *longitude = atof(degree1) + atof(minute1) / 60;                                                                                                       
+        *longitude = atof(degree1) + atof(minute1) / 60;
+*/				
         break;
 			}
 			case 5:
@@ -58,12 +62,14 @@ int parseGPSData(char* gpsString, float* latitude, float* longitude, int* time, 
 			case 6:
   		{
 				//Convert longitude from degrees and minutes to decimal degrees
-        char degree2[4], minute2[9];
+        /*
+				char degree2[4], minute2[9];
         strncpy(degree2, token, 3);
         strncpy(minute2, token + 3, 8);
         degree2[3] = '\0';
         minute2[8] = '\0';
         *longitude = atof(degree2) + atof(minute2) / 60;
+				*/
         break;
       }     
 			case 7:
@@ -81,8 +87,8 @@ int parseGPSData(char* gpsString, float* latitude, float* longitude, int* time, 
     token = strtok(NULL, ",");    
   }
     //check the sign of latitude and longitude
-  if (*NS == 'S'){*latitude= -*latitude;}
-  if (*EW == 'W' ){*longitude= -*longitude;}
+  //if (*NS == 'S'){*latitude= -*latitude;}
+  //if (*EW == 'W' ){*longitude= -*longitude;}
 	
 	return 0;
 }

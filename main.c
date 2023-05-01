@@ -34,12 +34,11 @@ int main() {
 		char buffer[80] = {0} ;
 		char output[40];
 		readGPS(buffer);
-		UART0_WriteString(buffer);
 		
 		if(parseGPSData(buffer, &GPSInfo.latitude, &GPSInfo.longitude, &GPSInfo.time, &GPSInfo.speed) == 0) {
 			char formattedTime[15];
-			//sprintf(formattedTime, "%i:%i:%i\n",  3, 1000, 100);
-			UART0_WriteString("555");
+			sprintf(formattedTime, "%i:%i:%i\n",  GPSInfo.time / 10000, (GPSInfo.time / 100) % 100, GPSInfo.time%100);
+			UART0_WriteString(formattedTime);
 			continue;
 		} 
 		
