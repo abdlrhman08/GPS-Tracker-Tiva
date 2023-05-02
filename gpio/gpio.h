@@ -2,12 +2,11 @@
 
 #include "tm4c123gh6ph.h"
 
-#define GPIO_Port 0x40000000
-#define DEN 0x51C
-#define DIR 0x400
-#define LOCK 0x520
-#define COMMIT 0x524
-#define DATA 0x3FC
+#define GPIO_PORT_DEN 0x4000051C
+#define GPIO_PORT_DIR 0x40000400
+#define GPIO_PORT_LOCK 0x40000520
+#define GPIO_PORT_COMMIT 0x40000524
+#define GPIO_PORT_DATA 0x400003FC
 
 typedef enum {
 	PortA = 0x04000,

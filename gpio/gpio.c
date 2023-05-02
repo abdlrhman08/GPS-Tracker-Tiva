@@ -20,19 +20,19 @@ void initPort(GPIO port) {
 	SYSCTL_RCGCGPIO_R |= clock;
 	while((SYSCTL_PRGPIO_R& (0x01 << 5)) == 0){}
 	
-	*((volatile unsigned long *)(GPIO_Port | port | LOCK)) 		   = 0x4C4F434B;
-	*((volatile unsigned long *)(GPIO_Port | port | COMMIT))		 = 0xFF;
-	*((volatile unsigned long *)(GPIO_Port | port | DEN)) 			 = 0x1E;
+	*((volatile unsigned long *)(GPIO_PORT_LOCK | port )) 		   = 0x4C4F434B;
+	*((volatile unsigned long *)(GPIO_PORT_COMMIT | port ))		 = 0xFF;
+	*((volatile unsigned long *)(GPIO_PORT_DEN | port )) 			 = 0x1E;
 		
 	//Defaulted on the pins on portF, a function later will be made for every pin
-	*((volatile unsigned long *)(GPIO_Port | port | DIR)) 			 = 0x0E;
+	*((volatile unsigned long *)(GPIO_PORT_DIR | port)) 			 = 0x0E;
 }
 
 void pinHigh(GPIO port, uint8_t pin) {
-	*((volatile unsigned long *)(GPIO_Port | port | DATA)) |= 0x1 << pin;
+	*((volatile unsigned long *)(GPIO_PORT_DATA | port)) |= 0x1 << pin;
 }
 
 void pinLow(GPIO port, uint8_t pin) {
-	*((volatile unsigned long *)(GPIO_Port | port | DATA)) &= ~(0x1 << pin);
+	*((volatile unsigned long *)(GPIO_PORT_DATA | port)) &= ~(0x1 << pin);
 }
 
