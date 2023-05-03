@@ -69,3 +69,21 @@ void UartGetString(uint32_t ui32Base, char *pcStr, uint8_t ui8StopChar)
     pcStr[ui32Count] = '\0';
 }
 
+void uartSendChar(uint32_t ui32Base, char c) {
+    // Wait until there is space available in the transmit FIFO
+    while (HWREG(ui32Base + UART_O_FR) & UART_FR_TXFF);
+
+    // Write the character to the transmit FIFO
+    HWREG(ui32Base + UART_O_DR) = c;
+}
+
+void uartSendString(uint32_t ui32Base, const char* pcStr) {
+    // Loop through the string until we reach the end ('\0')
+    while (*pcStr != '\0') {
+        // Send the current character
+        uartSendChar(ui32Base, *pcStr);
+
+        // Move to the next character in the string
+        pcStr++;
+    }
+}
