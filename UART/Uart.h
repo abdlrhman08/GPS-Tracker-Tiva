@@ -21,3 +21,9 @@
 #define GPIO_PIN_5              0x00000020  // GPIO pin 5
 #define GPIO_PIN_6              0x00000040  // GPIO pin 6
 #define GPIO_PIN_7              0x00000080  // GPIO pin 7
+
+
+void UartInitialize(uint32_t ui32Base);
+char uartGetChar(uint32_t ui32Base);
+void UartGetString(uint32_t ui32Base, char *pcStr, uint8_t ui8StopChar);
+
