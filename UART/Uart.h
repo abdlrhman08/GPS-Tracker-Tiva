@@ -26,4 +26,5 @@
 void UartInitialize(uint32_t ui32Base);
 char uartGetChar(uint32_t ui32Base);
 void UartGetString(uint32_t ui32Base, char *pcStr, uint8_t ui8StopChar);
-
+void uartSendChar(uint32_t ui32Base, char c);
+void uartSendString(uint32_t ui32Base, const char* pcStr);
