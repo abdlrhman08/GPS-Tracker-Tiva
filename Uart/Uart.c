@@ -64,14 +64,16 @@ void UartInitialize(uint8_t UartNum, char PortLetter)
 }
 
 void UART_WriteChar(unsigned char ch) {
-    while ((((UART0_FR_R)+(UartNum * 0x1000)) & TXFULL) != 0) {} //checks if fifo is full
-    ((UART0_DR_R)+(UartNum * 0x1000)) = ch;
+    while ((*((volatile uint32_t*)((UART0_FR_R) + (UartNum * 0x1000))) & TXFULL) != 0) {} // checks if FIFO is full
+    (*((volatile uint32_t*)((UART0_DR_R) + (UartNum * 0x1000)))) = ch;
 }
 
+
 unsigned char UART_ReadChar(void) {
-    while ((((UART0_FR_R)+(UartNum * 0x1000)) & RXEMPTY) != 0) {} //checks fifo is empty
-    return ((UART0_DR_R)+(UartNum * 0x1000)) & 0xFF; //return character from data register,least significant 8 bits
+    while ((*((volatile uint32_t*)((UART0_FR_R)+(UartNum * 0x1000))) & RXEMPTY) != 0) {} // checks if FIFO is empty
+    return (*((volatile uint32_t*)((UART0_DR_R)+(UartNum * 0x1000)))) & 0xFF; // return character from data register, least significant 8 bits
 }
+
 
 void UART_WriteString(char* str) {
     while (*str) { //loop continue till null character
