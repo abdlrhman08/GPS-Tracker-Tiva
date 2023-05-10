@@ -1,6 +1,3 @@
-//
-// Created by Mahmoud Osama on 5/9/2023.
-//
 
 //GPIO
 #define GPIO_O_DEN              0x0000051C  // GPIO Digital Enable
