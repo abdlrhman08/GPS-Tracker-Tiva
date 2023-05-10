@@ -130,13 +130,13 @@ void get_Time(char*GPRMC_String,char*Time_Buffer)
     uint32_t Time_value;
 
     /* parse Time in GPRMC string stored in buffer */
-    for(index = 0; GPRMC_String[index]!=','; index++)
+    for(index = 7; GPRMC_String[index]!=','; index++)
     {
         /* Skip the first 7 fields before the time field in GPRMC string */
-        if(index >= 7) {
+      
             Time_Buffer[time_index] = GPRMC_String[index];
             time_index++;
-        }
+       
     }
     Time_value = atol(Time_Buffer);               /* convert string to integer */
     hour = (Time_value / 10000);                  /* extract hour from integer */
