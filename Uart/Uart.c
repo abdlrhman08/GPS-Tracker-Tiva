@@ -14,7 +14,7 @@ PORT D --> UART 2 & 6
 PORT E --> UART 5 & 7
 */
 
-void UartInitialize(uint8_t UartNum, char PortLetter)
+void UART_Initialize(uint8_t UartNum, char PortLetter)
 {
     // Enable the UART peripheral
     *((volatile uint32_t*)(SYSCTL_RCGCUART)) |= (1 << UartNum);
