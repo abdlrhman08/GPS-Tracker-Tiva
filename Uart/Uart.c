@@ -63,26 +63,26 @@ void UART_Initialize(uint8_t UartNum, char PortLetter)
     *((volatile uint32_t*)((UART0_CTL_R)+(UartNum * 0x1000))) |= 0x301;
 }
 
-void UART_WriteChar(unsigned char ch) {
+void UART_WriteChar(uint8_t UartNum ,unsigned char ch) {
     while ((*((volatile uint32_t*)((UART0_FR_R) + (UartNum * 0x1000))) & TXFULL) != 0) {} // checks if FIFO is full
     (*((volatile uint32_t*)((UART0_DR_R) + (UartNum * 0x1000)))) = ch;
 }
 
 
-unsigned char UART_ReadChar(void) {
+unsigned char UART_ReadChar(uint8_t UartNum) {
     while ((*((volatile uint32_t*)((UART0_FR_R)+(UartNum * 0x1000))) & RXEMPTY) != 0) {} // checks if FIFO is empty
     return (*((volatile uint32_t*)((UART0_DR_R)+(UartNum * 0x1000)))) & 0xFF; // return character from data register, least significant 8 bits
 }
 
 
-void UART_WriteString(char* str) {
+void UART_WriteString(uint8_t UartNum ,char* str) {
     while (*str) { //loop continue till null character
         UART_WriteChar(*str); //write current character in buffer
         str++; //move to next character
     }
 }
 
-void UART_ReadString(char* str, char stopCh) {
+void UART_ReadString(uint8_t UartNum ,char* str, char stopCh) {
     char c = UART_ReadChar(); // read first character
     while (c && c != stopCh) { //checks for stop character or null charcter
         *str = c; // store current character
