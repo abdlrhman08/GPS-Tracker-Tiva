@@ -1,4 +1,5 @@
-
+#define HWREG(x)                                                              \
+        (*((volatile uint32_t *)(x)))
 //GPIO
 #define GPIO_O_DEN              0x0000051C  // GPIO Digital Enable
 #define GPIO_O_PUR              0x00000510  // GPIO Pull-Up Select
