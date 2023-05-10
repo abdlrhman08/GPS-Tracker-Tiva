@@ -120,7 +120,7 @@ bool validate_GPRMC_checksum(const char* GPRMC_String)
     return (expected_checksum == calculated_checksum);
 }
 
-void get_Time(uint32_t ui32Base,char*GPRMC_String,char*Time_Buffer)
+void get_Time(char*GPRMC_String,char*Time_Buffer)
 {
 
 
