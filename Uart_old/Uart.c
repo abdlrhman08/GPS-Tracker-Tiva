@@ -41,7 +41,7 @@ void UART_Initialize(uint8_t UartNum, char PortLetter)
     else if (UartNum == 2 || UartNum == 4 || UartNum == 5) {
         VAL = 0x30;
     }
-    else if (UartNum == 3) {
+    else if (UartNum == 3  || UartNum == 6 ) {
         VAL = 0xC0;
     }
     // Configure the GPIO pins for UART function
