@@ -196,12 +196,18 @@ void get_Latitude( char* GPRMC_String, char* Latitude_Buffer)
     uint8_t lat_index = 0;
     uint8_t index = 0;
 
-    /* find index of first ',' in GPRMC string */
-    while (GPRMC_String[index] != ',')
+   for(uint8_t comma_count=0; GPRMC_String[index] != '\0'; index++)
     {
-        index++;
+        if(GPRMC_String[index] == ',')
+        {
+            comma_count++;
+            if(comma_count == 5)
+            {
+                index++;
+                break;
+            }
+        }
     }
-    index++; // move to the next character after ','
 
     /* parse Latitude in GPRMC string stored in buffer */
     for (; GPRMC_String[index] != ','; index++)
