@@ -4,7 +4,7 @@
 #define baudRate 9600
 #define CLDIV  ((16000000.0) / ((16.0) * (baudRate)))
 #define uartIBRD ((int)(CLDIV))
-#define uartFBRD ((int)(((((CLDIV)) - (uartIBRD))) * (64)) + (0.5))
+#define uartFBRD ((int)((((CLDIV) - (uartIBRD)) * (64)) + (0.5)))
 
 /*
 PORT A --> UART 0
