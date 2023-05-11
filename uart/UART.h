@@ -1,60 +1,42 @@
-#include "tm4c123gh6pm.h"
+//
+// Created by zyn66 on 5/3/2023.
+//
+#include <stdbool.h>
+#include "needed_files/tm4c123gh6pm.h"
+#include "needed_files/hw_uart.h"
+#include "needed_files/hw_memmap.h"
+#include "needed_files/hw_gpio.h"
+#include "needed_files/hw_sysctl.h"
+#include "needed_files/hw_types.h"
 
-#define SET(P_DATA,PIN) (P_DATA |= (0x01 << PIN))
-#define CLEAR(P_DATA,PIN) (P_DATA &= ~(0x01 << PIN))
-#define TOGGLE(P_DATA,PIN) (P_DATA ^= (0x01 << PIN))
-#define DEG_TO_RAD(DEG)((DEG*PI/180))
+#ifndef UART_H
+#define UART_H
 
-//baud_rate calculation
+typedef enum {
+    UART_OK = 1,
+    UART_ERROR = 0
+} UART_Status;
+
+#endif /* UART_H */
+
 #define baudRate 9600
-#define CLDIV  ((16000000.0) / ((16.0) * (baudRate)))
-#define uartIBRD ((int)(CLDIV))
-#define uartFBRD ((int)(((((CLDIV)) - (uartIBRD))) * (64)) + (0.5))
-	
-#define TXFULL 0x00000020
-#define RXEMPTY 0x00000010
+#define CLDIV  (((16000000.0) / ((16.0) * (baudRate))))
+#define UART_STRING_BUFFER_SIZE 80
+#define GPIO_PIN_0              0x00000001  // GPIO pin 0
+#define GPIO_PIN_1              0x00000002  // GPIO pin 1
+#define GPIO_PIN_2              0x00000004  // GPIO pin 2
+#define GPIO_PIN_3              0x00000008  // GPIO pin 3
+#define GPIO_PIN_4              0x00000010  // GPIO pin 4
+#define GPIO_PIN_5              0x00000020  // GPIO pin 5
+#define GPIO_PIN_6              0x00000040  // GPIO pin 6
+#define GPIO_PIN_7              0x00000080  // GPIO pin 7
 
-
-//UART0
-void UART0_Init();
-
-void UART0_WriteChar(unsigned char ch);
-
-unsigned char UART0_ReadChar(void);
-
-void UART0_WriteString(char *str);
-
-void UART0_ReadString(char *str, char stopCh);
-
-//UART1
-void UART1_Init();
-
-void UART1_WriteChar(unsigned char ch);
-
-unsigned char UART1_ReadChar(void);
-
-void UART1_WriteString(char *str);
-
-void UART1_ReadString(char *str, char stopCh);
-
-//UART5
-void UART5_Init();
-
-void UART5_WriteChar(unsigned char ch);
-
-unsigned char UART5_ReadChar(void);
-
-void UART5_WriteString(char *str);
-
-void UART5_ReadString(char *str, char stopCh);
-
-//UART7
-void UART7_Init();
-
-void UART7_WriteChar(unsigned char ch);
-
-unsigned char UART7_ReadChar(void);
-
-void UART7_WriteString(char *str);
-
-void UART7_ReadString(char *str, char stopCh);
+void UartGetString(uint32_t ui32Base, char *pcStr, uint8_t ui8StopChar);
+void uartSendChar(uint32_t ui32Base, char c);
+void uartSendString(uint32_t ui32Base, const char* pcStr);
+char uartGetChar(uint32_t ui32Base);
+void UartInitialize(uint32_t ui32Base);
+void oneMilliSecond(uint32_t ms);
+void hundredMicroSecounds(void);
+bool UARTCharsAvail(uint32_t ui32Base);
+uint32_t UARTCharGetNonBlocking(uint32_t ui32Base, char *pcData);

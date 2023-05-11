@@ -1,185 +1,145 @@
+//
+// Created by zyn66 on 5/3/2023.
+//
 
+#include <stdint.h>
 #include "UART.h"
 
 
+#ifndef UART_H
+#define UART_H
 
-// UART0
+typedef enum {
+    UART_OK = 1,
+    UART_ERROR = 0
+} UART_Status;
 
-void UART0_Init(){
+#endif /* UART_H */
+// if you want to use type(UART0_BASE,UART1_BASE,.....)
 
-	SET(SYSCTL_RCGCUART_R,0);	//enable clock for UART0
-	SET(SYSCTL_RCGCGPIO_R,0);	//enable clock for GPIO_A
-	while((SYSCTL_PRGPIO_R & 0x01) == 0){}	//waiting for activation
-	GPIO_PORTA_DEN_R |= 0x03; //digital enable of PAO & PA1
-	GPIO_PORTA_AFSEL_R |= 0x03;
-	GPIO_PORTA_AMSEL_R &= ~0x03;	//Disable analog function PA0 & PA1
-	GPIO_PORTA_PCTL_R |= 0x00000011; //select UART0 function for PA0 & PA1
-	CLEAR(UART0_CTL_R,0);	// clear control register
-	UART0_IBRD_R = uartIBRD;	//configure UART0 with desired baud rate (integer part)
-	UART0_FBRD_R = uartFBRD;	//fractional part
-	UART0_LCRH_R |= 0x70;	//enable FIFO , 8 bit data
-	UART0_CTL_R |= 0x301;	//enable uart as tx and rx
+void UartInitialize(uint32_t ui32Base)
+{
+    // Enable the UART peripheral
+	uint32_t ui32Port = (ui32Base == UART0_BASE) ? GPIO_PORTA_BASE : GPIO_PORTB_BASE;
+    HWREG(SYSCTL_RCGCUART) |= (1 << ((ui32Base - UART0_BASE) / 0x1000));
+
+    // Enable the GPIO port that is used for the UART pins
 	
+    
+    HWREG(SYSCTL_RCGCGPIO) |= (1 << ((ui32Base - UART0_BASE) / 0x1000));
+		while((SYSCTL_PRGPIO_R & (0x01 << ((ui32Base - UART0_BASE) / 0x1000))) == 0){}
+
+    // Configure the UART pins
+    HWREG(ui32Port + GPIO_O_DEN) |= (GPIO_PIN_0 | GPIO_PIN_1);
+    HWREG(ui32Port + GPIO_O_PUR) |= GPIO_PIN_0;
+	HWREG(ui32Port + GPIO_O_PCTL) |= 0x11;
+    HWREG(ui32Base + UART_O_CTL) &= ~(UART_CTL_UARTEN);
+    HWREG(ui32Base + UART_O_CTL) |= UART_CTL_EOT;
+    HWREG(ui32Base + UART_O_CTL) &= ~(UART_CTL_LBE);
+    HWREG(ui32Base + UART_O_IBRD) = (int)CLDIV;
+    HWREG(ui32Base + UART_O_FBRD) = ((int)((((CLDIV) - ((int)(CLDIV))) * (64)) + (0.5)));
+    HWREG(ui32Base + UART_O_LCRH) = UART_LCRH_WLEN_8 ;
+    HWREG(ui32Base + UART_O_CTL) |= (UART_CTL_RXE | UART_CTL_TXE | UART_CTL_UARTEN);
+    HWREG(ui32Port + GPIO_O_AFSEL) |= (GPIO_PIN_0 | GPIO_PIN_1);
+
 }
 
-void UART0_WriteChar(unsigned char ch){						
-	while((UART0_FR_R&TXFULL) != 0){} //checks if fifo is full
-	UART0_DR_R = ch;
+char uartGetChar(uint32_t ui32Base)
+{
+    char c;
+
+    // Wait for a character to be received
+    while(((HWREG(ui32Base + UART_O_FR) & UART_FR_RXFE)) != 0);
+
+    // Read the received character
+    c = HWREG(ui32Base + UART_O_DR) & 0xFF;
+
+    return c;
 }
 
-unsigned char UART0_ReadChar(void){							
-	while((UART0_FR_R&RXEMPTY) != 0){} //checks fifo is empty
-	return UART0_DR_R&0xFF; //return character from data register,least significant 8 bits
+void UartGetString(uint32_t ui32Base, char *pcStr, uint8_t ui8StopChar)
+{
+    uint32_t ui32Count = 0;
+    char cChar;
+
+    while (1)
+    {
+        cChar = uartGetChar(ui32Base);
+
+        if (cChar == ui8StopChar)
+        {
+            break;
+        }
+
+        pcStr[ui32Count] = cChar;
+        ui32Count++;
+
+        // Check if the string buffer is full
+        if (ui32Count == UART_STRING_BUFFER_SIZE - 1)
+        {
+            break;
+        }
+    }
+
+    // Null-terminate the string
+    pcStr[ui32Count] = '\0';
 }
 
-void UART0_WriteString(char *str){								
-  while(*str){ //loop continue till null character
-    UART0_WriteChar(*str); //write current character in buffer
-    str++; //move to next character
-  }
+void uartSendChar(uint32_t ui32Base, char c) {
+    // Wait until there is space available in the transmit FIFO
+    while (HWREG(ui32Base + UART_O_FR) & UART_FR_TXFF);
+
+    // Write the character to the transmit FIFO
+    HWREG(ui32Base + UART_O_DR) = c;
 }
 
-void UART0_ReadString(char *str, char stopCh){		
-	char c = UART0_ReadChar(); // read first character
-	while(c && c != stopCh){ //checks for stop character or null charcter
-		*str = c; // store current character
-		str++; //move to next character
-		c = UART0_ReadChar(); //read next character
-	}
-	*str = 0x00;  //adding null character
+void uartSendString(uint32_t ui32Base, const char* pcStr) {
+    // Loop through the string until we reach the end ('\0')
+    while (*pcStr != '\0') {
+        // Send the current character
+        uartSendChar(ui32Base, *pcStr);
+
+        // Move to the next character in the string
+        pcStr++;
+    }
 }
 
-// UART1
+bool UARTCharsAvail(uint32_t ui32Base)
+{
+    // Get the number of bytes available in the receive FIFO
+    uint32_t ui32BytesAvailable = UARTCharsAvail(ui32Base);
 
-void UART1_Init(){
-
-	SET(SYSCTL_RCGCUART_R,1);
-	SET(SYSCTL_RCGCGPIO_R,2);
-	while((SYSCTL_PRGPIO_R & (0x01 << 2)) == 0){}
-	GPIO_PORTC_DEN_R |= 0x30;	//digital enable of PBO & PB1
-	GPIO_PORTC_AFSEL_R |= 0x30; 	//alternate function for PB0 & PB1
-	GPIO_PORTC_AMSEL_R &= ~0x30;	//Disable analog function PB0 & PB1
-	GPIO_PORTC_PCTL_R |= 0x00220000;	//select UART0 function for PC4 & PC5
-	CLEAR(UART1_CTL_R,0);
-	UART1_IBRD_R = uartIBRD;
-	UART1_FBRD_R = uartFBRD;
-	UART1_LCRH_R |= 0x70;
-	UART1_CTL_R |= 0x301;
-	
+    // Return true if at least one byte is available, false otherwise
+    return (ui32BytesAvailable > 0);
 }
-void UART1_WriteChar(unsigned char ch){						
-	while((UART1_FR_R&TXFULL) != 0){}
-	UART1_DR_R = ch;
+uint32_t UARTCharGetNonBlocking(uint32_t ui32Base, char *pcData)
+{
+    // Check if there is data in the receive FIFO
+    if(UARTCharsAvail(ui32Base))
+    {
+        // Read the character from the receive FIFO
+        *pcData = uartGetChar(ui32Base);
+        return UART_OK;
+    }
+    else
+    {
+        // There is no data available in the receive FIFO
+        return UART_ERROR;
+    }
 }
-
-unsigned char UART1_ReadChar(void){						
-	while((UART1_FR_R&RXEMPTY) != 0){}
-	return UART1_DR_R&0xFF;
-}
-
-void UART1_WriteString(char *str){								
-  while(*str){
-    UART1_WriteChar(*str);
-    str++;
-  }
-}
-
-void UART1_ReadString(char *str, char stopCh){		
-	char c = UART1_ReadChar();
-	while(c && c != stopCh){
-		*str = c;
-		str++;
-		c = UART1_ReadChar();
-	}
-	*str = 0x00;
-}
-
-// UART5
-
-void UART5_Init(){
-
-	SET(SYSCTL_RCGCUART_R,5);
-	SET(SYSCTL_RCGCGPIO_R,4);
-	while((SYSCTL_PRGPIO_R & (0x01<<4)) == 0){}
-	CLEAR(UART5_CTL_R,0);
-	UART5_IBRD_R = uartIBRD;
-	UART5_FBRD_R = uartFBRD;
-	UART5_LCRH_R |= 0x70;
-	UART5_CTL_R |= 0x301;
-	GPIO_PORTE_DEN_R |= 0x30;		//digital enable of PE4 & PE5
-	GPIO_PORTE_AFSEL_R |= 0x30;		//alternate function for PE4 & PE5
-	GPIO_PORTE_AMSEL_R &= ~0x30;	//Disable analog function PE4 & PE5
-	GPIO_PORTE_PCTL_R |= 0x00110000; //select UART0 function for PE4 & PE5
-	
-}
-void UART5_WriteChar(unsigned char ch){						
-	while((UART5_FR_R&TXFULL) != 0){}
-	UART5_DR_R = ch;
-}
-
-unsigned char UART5_ReadChar(void){								
-	while((UART5_FR_R&RXEMPTY) != 0){}
-	return UART5_DR_R&0xFF;
-}
-
-void UART5_WriteString(char *str){								
-  while(*str){
-    UART5_WriteChar(*str);
-    str++;
-  }
-}
-
-void UART5_ReadString(char *str, char stopCh){		
-	char c = UART5_ReadChar();
-	while(c && c != stopCh){
-		*str = c;
-		str++;
-		c = UART5_ReadChar();
-	}
-	*str = 0x00;
-}
-
-// UART7
-
-void UART7_Init(){
-
-	SET(SYSCTL_RCGCUART_R,7);
-	SET(SYSCTL_RCGCGPIO_R,4);
-	while((SYSCTL_PRGPIO_R & (0x01<<4)) == 0){}
-	CLEAR(UART7_CTL_R,0);
-	UART7_IBRD_R = uartIBRD;
-	UART7_FBRD_R = uartFBRD;
-	UART7_LCRH_R |= 0x70;
-	UART7_CTL_R |= 0x301;
-	GPIO_PORTE_DEN_R |= 0x03;	//digital enable of PEO & PE1
-	GPIO_PORTE_AFSEL_R |= 0x03;	//alternate function for PE0 & PE1
-	GPIO_PORTE_AMSEL_R &= ~0x03;	//Disable analog function PE0 & PE1
-	GPIO_PORTE_PCTL_R |= 0x00000011;	//select UART0 function for PE0 & PE1
-	
-}
-void UART7_WriteChar(unsigned char ch){		
-	while((UART7_FR_R&TXFULL) != 0){}
-	UART7_DR_R = ch;
-}
-
-unsigned char UART7_ReadChar(void){								
-	while((UART7_FR_R&RXEMPTY) != 0){}
-	return UART7_DR_R&0xFF;
-}
-
-void UART7_WriteString(char *str){		
-  while(*str){
-    UART7_WriteChar(*str);
-    str++;
-  }
-}
-
-void UART7_ReadString(char *str, char stopCh){		
-	char c = UART7_ReadChar();
-	while(c != stopCh){//while(c && c != stopCh){
-		*str = c;
-		str++;
-		c = UART7_ReadChar();
-	}
-	*str = 0x00;
-}
+void hundredMicroSecounds(void)
+{
+    NVIC_ST_CTRL_R = NVIC_ST_CTRL_R & ~(0x00000001); //disable Timer
+    NVIC_ST_RELOAD_R = (1600000 - 1); 		//to make 1 secound as our Tiva has clk = 16 MHZ
+    NVIC_ST_CURRENT_R = 0; 				//to clear counter value and underflow flag of counter
+    NVIC_ST_CTRL_R |= 0x5; 				//to put at source clk 1 to get PROCESOR CLK NOT its 8th only and enable Timer
+};
+void oneMilliSecond(uint32_t ms)
+{
+    uint32_t delay_cycles = 16000 * ms; //16000 cycles = 1 millisecond
+    NVIC_ST_CTRL_R = NVIC_ST_CTRL_R & ~(0x00000001); //disable Timer
+    NVIC_ST_RELOAD_R = (delay_cycles - 1); //set the delay value
+    NVIC_ST_CURRENT_R = 0; //reset the counter
+    NVIC_ST_CTRL_R |= 0x5; //enable and start the Timer
+    while((NVIC_ST_CTRL_R & 0x00010000) == 0); //wait for Timer to finish
+};

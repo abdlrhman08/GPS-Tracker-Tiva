@@ -7,7 +7,7 @@
 typedef struct INFO {
 	float longitude;
 	float latitude;
-	float speed;
+	double speed;
 	
 	int time;
 	int date;
@@ -19,4 +19,4 @@ void sendGPSCommand(char* command);
 
 void readGPS(char* str);
 
-int parseGPSData(char* gpsString, float* latitude, float* longitude, int* time, float* speed);
+int parseGPSData(char* gpsString, float* latitude, float* longitude, int* time, double* speed);

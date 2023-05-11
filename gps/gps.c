@@ -6,16 +6,16 @@ void sendGPSCommand(char* command) {
 	
 	char newCommand[27];
 	sprintf(newCommand, "$%s*%X\r\n", command, checkSum);
-	UART1_WriteString(newCommand);
+	//UART1_WriteString(newCommand);
 }
 
 void readGPS(char* str) {
 	char buffer[100];
-	UART1_ReadString(buffer, '\n');
+//	UART1_ReadString(buffer, '\n');
 	sprintf(str, "%s\n", buffer);
 }
 
-int parseGPSData(char* gpsString, float* latitude, float* longitude, int* time, float* speed) {
+int parseGPSData(char* gpsString, float* latitude, float* longitude, int* time, double* speed) {
     
   // Split GPS string into parts
 	int count = 0;  
@@ -40,47 +40,48 @@ int parseGPSData(char* gpsString, float* latitude, float* longitude, int* time, 
 			}
       case 4:
 			{
-        // Convert latitude from degrees and minutes to decimal degrees
-				
-				
 				char degree1[3], minute1[9];
+        // Convert latitude from degrees and minutes to decimal degrees
+	/*			
 				
-			/*
+				
+				
+			
         strncpy(degree1, token, 2);
         strncpy(minute1, token + 2, 8);
         degree1[2] = '\0';
         minute1[8] = '\0';
         *longitude = atof(degree1) + atof(minute1) / 60;
-*/				
+		*/
         break;
 			}
 			case 5:
 			{
-				NS = token;
+				//NS = token;
         break;
 			}
 			case 6:
   		{
 				//Convert longitude from degrees and minutes to decimal degrees
-        /*
+/*
 				char degree2[4], minute2[9];
         strncpy(degree2, token, 3);
         strncpy(minute2, token + 3, 8);
         degree2[3] = '\0';
         minute2[8] = '\0';
         *longitude = atof(degree2) + atof(minute2) / 60;
-				*/
+*/
         break;
       }     
 			case 7:
 			{
-				EW = token;
+				//EW = token;
         break;
 				
       }
 			case 8:
 			{
-        *speed = atof(token) * 0.514444;
+        *speed = strtof(token, NULL);
          break;
 			}
 		}
@@ -88,7 +89,6 @@ int parseGPSData(char* gpsString, float* latitude, float* longitude, int* time, 
   }
     //check the sign of latitude and longitude
   //if (*NS == 'S'){*latitude= -*latitude;}
-  //if (*EW == 'W' ){*longitude= -*longitude;}
-	
+  //if (*EW == 'W' ){*longitude= -*longitude;}	
 	return 0;
 }
