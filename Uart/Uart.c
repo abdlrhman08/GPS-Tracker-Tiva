@@ -17,7 +17,7 @@ PORT E --> UART 5 & 7
 void UART_Initialize(uint8_t UartNum, char PortLetter)
 {
     // Enable the UART peripheral
-    *((volatile uint32_t*)(SYSCTL_RCGCUART)) |= (1 << UartNum);
+    *((volatile uint32_t*)(SYSCTL_RCGCUART_R)) |= (1 << UartNum);
 
     // Enable the GPIO port that is used for the UART pins
     uint32_t PORT_NUM = 0;
@@ -29,10 +29,10 @@ void UART_Initialize(uint8_t UartNum, char PortLetter)
     case 'E': PORT_NUM = 20; BREAK;
     }
 
-    *((volatile uint32_t*)(SYSCTL_RCGCGPIO)) |= (1 << (PortLetter - 'A'));
+    *((volatile uint32_t*)(SYSCTL_RCGCGPIO_R)) |= (1 << (PortLetter - 'A'));
 
     // Wait for the GPIO port to be ready
-    while ((*((volatile uint32_t*)(SYSCTL_PRGPIO)) & (1 << (PortLetter - 'A'))) == 0) {}
+    while ((*((volatile uint32_t*)(SYSCTL_PRGPIO_R)) & (1 << (PortLetter - 'A'))) == 0) {}
 
     //Values for GPIO registers
     if (UartNum == 0 || UartNum == 1 || UartNum == 7) {
@@ -77,17 +77,17 @@ unsigned char UART_ReadChar(uint8_t UartNum) {
 
 void UART_WriteString(uint8_t UartNum ,char* str) {
     while (*str) { //loop continue till null character
-        UART_WriteChar(*str); //write current character in buffer
+        UART_WriteChar(UartNum,*str); //write current character in buffer
         str++; //move to next character
     }
 }
 
 void UART_ReadString(uint8_t UartNum ,char* str, char stopCh) {
-    char c = UART_ReadChar(); // read first character
+    char c = UART_ReadChar(UartNum); // read first character
     while (c && c != stopCh) { //checks for stop character or null charcter
         *str = c; // store current character
         str++; //move to next character
-        c = UART_ReadChar(); //read next character
+        c = UART_ReadChar(UartNum); //read next character
     }
     *str = 0x00;  //adding null character
 }
