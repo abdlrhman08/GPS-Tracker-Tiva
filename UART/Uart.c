@@ -90,11 +90,8 @@ void uartSendString(uint32_t ui32Base, const char* pcStr) {
 
 bool UARTCharsAvail(uint32_t ui32Base)
 {
-    // Get the number of bytes available in the receive FIFO
-    uint32_t ui32BytesAvailable = UARTCharsAvail(ui32Base);
-
-    // Return true if at least one byte is available, false otherwise
-    return (ui32BytesAvailable > 0);
+    // Check if there is at least one byte available in the receive FIFO
+    return (HWREG(ui32Base + UART_O_FR) & UART_FR_RXFE) == 0;
 }
 uint32_t UARTCharGetNonBlocking(uint32_t ui32Base, char *pcData)
 {
