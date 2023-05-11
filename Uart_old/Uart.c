@@ -17,7 +17,7 @@ PORT E --> UART 5 & 7
 void UART_Initialize(uint8_t UartNum, char PortLetter)
 {
     // Enable the UART peripheral
-    *((volatile uint32_t*)(SYSCTL_RCGCUART)) |= (1 << UartNum);
+    *((volatile uint32_t*)(SYSCTL_RCGCUART_R)) |= (1 << UartNum);
 
     // Enable the GPIO port that is used for the UART pins
     uint32_t PORT_NUM = 0;
@@ -29,10 +29,10 @@ void UART_Initialize(uint8_t UartNum, char PortLetter)
     case 'E': PORT_NUM = 20; BREAK;
     }
 
-    *((volatile uint32_t*)(SYSCTL_RCGCGPIO)) |= (1 << (PortLetter - 'A'));
+    *((volatile uint32_t*)(SYSCTL_RCGCGPIO_R)) |= (1 << (PortLetter - 'A'));
 
     // Wait for the GPIO port to be ready
-    while ((*((volatile uint32_t*)(SYSCTL_PRGPIO)) & (1 << (PortLetter - 'A'))) == 0) {}
+    while ((*((volatile uint32_t*)(SYSCTL_PRGPIO_R)) & (1 << (PortLetter - 'A'))) == 0) {}
 
     //Values for GPIO registers
     if (UartNum == 0 || UartNum == 1 || UartNum == 7) {
