@@ -77,17 +77,17 @@ unsigned char UART_ReadChar(uint8_t UartNum) {
 
 void UART_WriteString(uint8_t UartNum ,char* str) {
     while (*str) { //loop continue till null character
-        UART_WriteChar(*str); //write current character in buffer
+        UART_WriteChar(UartNum,*str); //write current character in buffer
         str++; //move to next character
     }
 }
 
 void UART_ReadString(uint8_t UartNum ,char* str, char stopCh) {
-    char c = UART_ReadChar(); // read first character
+    char c = UART_ReadChar(UartNum); // read first character
     while (c && c != stopCh) { //checks for stop character or null charcter
         *str = c; // store current character
         str++; //move to next character
-        c = UART_ReadChar(); //read next character
+        c = UART_ReadChar(UartNum); //read next character
     }
     *str = 0x00;  //adding null character
 }
