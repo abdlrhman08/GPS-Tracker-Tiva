@@ -1,13 +1,18 @@
+#ifndef GPS_H
+#define GPS_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #include "../utils.h"
 
 typedef struct INFO {
 	float longitude;
 	float latitude;
-	double speed;
+	float speed;
 	
 	int time;
 	int date;
@@ -15,8 +20,12 @@ typedef struct INFO {
 } INFO;
 
 
-void sendGPSCommand(char* command);
+void sendGPSCommand(uint32_t base, char* command);
 
-void readGPS(char* str);
+void get_Time(char*GPRMC_String,char*Time_Buffer);
+void get_Longitude(char* GPRMC_String, char* Longitude_Buffer);
+void get_Latitude( char* GPRMC_String, char* Latitude_Buffer);
 
-int parseGPSData(char* gpsString, float* latitude, float* longitude, int* time, double* speed);
+bool checkValidity(char* buffer); 
+
+#endif
