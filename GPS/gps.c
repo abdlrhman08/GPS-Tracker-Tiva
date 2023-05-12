@@ -148,72 +148,30 @@ void get_Time(char*GPRMC_String,char*Time_Buffer)
 
 }
 
-void getSpeed(const char* GPRMC_String,char* speed) {
+void getSpeed(const char* GPRMC_String, char* speed) {
     uint8_t long_index = 0;
     uint8_t index = 0;
-    for(uint8_t comma_count=0; GPRMC_String[index] != '\0'; index++)
-    {
-        if(GPRMC_String[index] == ',')
-        {
+    for (uint8_t comma_count = 0; GPRMC_String[index] != '\0'; index++) {
+        if (GPRMC_String[index] == ',') {
             comma_count++;
-            if(comma_count == 7)
-            {
+            if (comma_count == 7) {
                 index++;
                 break;
             }
         }
     }
-    for(; GPRMC_String[index] != ',' && GPRMC_String[index] != '\0'; index++)
-    {
+    for (; GPRMC_String[index] != ',' && GPRMC_String[index] != '\0'; index++) {
         speed[long_index] = GPRMC_String[index];
         long_index++;
     }
     float speedInKnots = atof(speed);
     float conversionFactor = 0.514444; // Conversion factor from knots to m/s
     float speedInMetersPerSecond = speedInKnots * conversionFactor;
-     sprintf(speed,"%.2f",speedInMetersPerSecond);
+    int speedIntPart = (int)speedInMetersPerSecond;
+    int speedFracPart = (int)((speedInMetersPerSecond - speedIntPart) * 100);
+    sprintf(speed, "%i.%i", speedIntPart, speedFracPart);
 }
 
-void get_Longitude( char* GPRMC_String, char* Longitude_Buffer)
-{
-
-    uint8_t long_index = 0;
-    uint8_t index = 0;
-
-    /* find the index of the fourth comma */
-    for(uint8_t comma_count=0; GPRMC_String[index] != '\0'; index++)
-    {
-        if(GPRMC_String[index] == ',')
-        {
-            comma_count++;
-            if(comma_count == 3)
-            {
-                index++;
-                break;
-            }
-        }
-    }
-
-    /* parse longitude in GPRMC string */
-    for(; GPRMC_String[index] != ',' && GPRMC_String[index] != '\0'; index++)
-    {
-        Longitude_Buffer[long_index] = GPRMC_String[index];
-        long_index++;
-    }
-
-    float long_decimal_value, long_degrees_value;
-    int32_t long_degrees;
-    long_decimal_value = atof(Longitude_Buffer);	/* Longitude in dddmm.mmmm */
-
-    /* convert raw longitude into degree format */
-    long_decimal_value = (long_decimal_value/100);	/* Longitude in ddd.mmmmmm */
-    long_degrees = (int)(long_decimal_value);	/* ddd of Longitude */
-    long_decimal_value = (long_decimal_value - long_degrees)/0.6;	/* .mmmmmm/0.6 (Converting minutes to equivalent degrees) */
-    long_degrees_value = (float)(long_degrees + long_decimal_value);	/* Longitude in dd.dddd format */
-
-    sprintf(Longitude_Buffer, "%f", long_degrees_value);
-
-}
 
 void get_Latitude( char* GPRMC_String, char* Latitude_Buffer)
 {
