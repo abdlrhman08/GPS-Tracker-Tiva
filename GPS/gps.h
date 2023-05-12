@@ -16,5 +16,5 @@ void get_Time(char*GPRMC_String,char*Time_Buffer);
 void get_Longitude( char* GPRMC_String, char* Longitude_Buffer);
 void get_Latitude( char* GPRMC_String, char* Latitude_Buffer);
 float Distance (char* lat1_str, char* lon1_str, char* lat2_str, char* lon2_str);
-
+void getSpeed(const char* GPRMC_String,char* speed);
 
