@@ -171,7 +171,7 @@ void getSpeed(const char* GPRMC_String,char* speed) {
     float speedInKnots = atof(speed);
     float conversionFactor = 0.514444; // Conversion factor from knots to m/s
     float speedInMetersPerSecond = speedInKnots * conversionFactor;
-     sprintf(speed,"%f",speedInMetersPerSecond);
+     sprintf(speed,"%.2f",speedInMetersPerSecond);
 }
 
 void get_Longitude( char* GPRMC_String, char* Longitude_Buffer)
