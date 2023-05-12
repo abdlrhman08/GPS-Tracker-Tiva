@@ -148,6 +148,32 @@ void get_Time(char*GPRMC_String,char*Time_Buffer)
 
 }
 
+void getSpeed(const char* GPRMC_String,char* speed) {
+    uint8_t long_index = 0;
+    uint8_t index = 0;
+    for(uint8_t comma_count=0; GPRMC_String[index] != '\0'; index++)
+    {
+        if(GPRMC_String[index] == ',')
+        {
+            comma_count++;
+            if(comma_count == 7)
+            {
+                index++;
+                break;
+            }
+        }
+    }
+    for(; GPRMC_String[index] != ',' && GPRMC_String[index] != '\0'; index++)
+    {
+        speed[long_index] = GPRMC_String[index];
+        long_index++;
+    }
+    float speedInKnots = atof(speed);
+    float conversionFactor = 0.514444; // Conversion factor from knots to m/s
+    float speedInMetersPerSecond = speedInKnots * conversionFactor;
+     sprintf(speed,"%f",speedInMetersPerSecond);
+}
+
 void get_Longitude( char* GPRMC_String, char* Longitude_Buffer)
 {
 
