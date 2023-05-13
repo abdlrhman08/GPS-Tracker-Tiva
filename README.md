@@ -20,7 +20,7 @@ This embedded module tracks your location using the gps module and parses all in
 ## Contributors
 
 |Name        | code    |Department  | 
-| :---: | :---: | :---: |
+| :--- | :---: | :---: |
 |Nassar khaled mesoud | 2001464 | CSE|
 |abdelrahman atef saad hamada |2101645| CSE|
 |abdelrahman zain mohmed |2101645| CSE|
