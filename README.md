@@ -7,7 +7,9 @@ This embedded module tracks your location using the gps module and parses all in
 * LCD >>displays the time ,speed and location 
 * java server 
 * wifi module >> makes connection wireless with pc
-* Application >>diplays same LCD info on pc
+* Application >>diplays same LCD info on pc ![image](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/131257593/f4245fdb-e9ab-42b1-b034-9010bcd61ede)
+
+
 * arduino mega + speaker >> treats pin 6 and 7 as the leds of TIVA so the speaker produces different songs in different situations
 
 * 
