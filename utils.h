@@ -1,11 +1,16 @@
+#ifndef UTILS_H
+#define UTILS_H
+
 #include <stdint.h>
 
-#define isdigit(c) (c >= '0' && c <= '9')
+#define M_PI 3.1415926
 
 #include "uart/uart.h"
 
 unsigned char calculateChecksum(char* str);
 
-double stof(const char* s);
+float deg2rad(float deg);
 
 void delay(int t);
+
+#endif

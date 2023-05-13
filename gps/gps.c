@@ -1,10 +1,10 @@
-
 #include "gps.h"
 
-/*
-*	Avoid using sprintf alot specially with floating variables
-* due to limitiations of the microcontroller
-*/
+
+float lat_decimal_value, lat_degrees_value;
+float long_decimal_value, long_degrees_value;
+float speedInKnots;
+
 
 void sendGPSCommand(uint32_t base, char* command) {
 	unsigned char checkSum = calculateChecksum(command);
@@ -21,10 +21,7 @@ void get_Latitude( char* GPRMC_String, char* Latitude_Buffer)
     uint8_t lat_index = 0;
     uint8_t index = 0;
 		uint8_t comma_count;
-	
-		float lat_decimal_value, lat_degrees_value;
     int32_t lat_degrees;
-		int latFrac;
 	
    for(comma_count=0; GPRMC_String[index] != '\0'; index++)
     {
@@ -46,23 +43,19 @@ void get_Latitude( char* GPRMC_String, char* Latitude_Buffer)
         lat_index++;
     }
 
-    lat_decimal_value = stof(Latitude_Buffer); /* Latitude in ddmm.mmmm */
-
+    lat_decimal_value = atof(Latitude_Buffer); /* Latitude in ddmm.mmmm */
+		
     /* convert raw latitude into degree format */
     lat_decimal_value = (lat_decimal_value / 100); /* Latitude in dd.mmmmmm */
     lat_degrees = (int)(lat_decimal_value); /* dd of latitude */
     lat_decimal_value = (lat_decimal_value - lat_degrees) / 0.6; /* .mmmm/0.6 (Converting minutes to eequivalent degrees) */
-    latFrac = lat_decimal_value * 1000000;
 		
-		//lat_degrees_value = (float)(lat_degrees + lat_decimal_value); /* Latitude in dd.dddd format */
-
-		/*
-		*	Using sprintf(buffer, "%f", lat_degrees_value);
-		* will not work due to the functions high emory consumptions
-		* specially with floating values
-		*/
+		lat_degrees_value = (float)(lat_degrees + lat_decimal_value);		/* Latitude in dd.dddd format */
 		
-    sprintf(Latitude_Buffer, "%i.%i", lat_degrees, latFrac);
+		if (GPRMC_String[++index] == 'S')
+			lat_degrees_value *= -1;
+		
+    sprintf(Latitude_Buffer, "%f", lat_degrees_value);
 
 }
 
@@ -71,9 +64,7 @@ void get_Longitude( char* GPRMC_String, char* Longitude_Buffer)
 
     uint8_t long_index = 0;
     uint8_t index = 0;
-		float long_decimal_value, long_degrees_value;
     int32_t long_degrees;
-		int longFrac;
 		uint8_t comma_count;
 	
     /* find the index of the fourth comma */
@@ -96,18 +87,47 @@ void get_Longitude( char* GPRMC_String, char* Longitude_Buffer)
         Longitude_Buffer[long_index] = GPRMC_String[index];
         long_index++;
     }
-    long_decimal_value = stof(Longitude_Buffer);	/* Longitude in dddmm.mmmm */
+    long_decimal_value = atof(Longitude_Buffer);	/* Longitude in dddmm.mmmm */
 
     /* convert raw longitude into degree format */
     long_decimal_value = (long_decimal_value/100);	/* Longitude in ddd.mmmmmm */
     long_degrees = (int)(long_decimal_value);	/* ddd of Longitude */
 		
     long_decimal_value = (long_decimal_value - long_degrees)/0.6;	/* .mmmmmm/0.6 (Converting minutes to equivalent degrees) */
-		longFrac = long_decimal_value * 1000000;
-		//long_degrees_value = (float)(long_degrees + long_decimal_value);	/* Longitude in dd.dddd format */
+		long_degrees_value = (float)(long_degrees + long_decimal_value);	/* Longitude in dd.dddd format */
+		
+		if (GPRMC_String[++index] == 'W')
+			long_degrees_value *= -1;
 
-		sprintf(Longitude_Buffer, "%i.%i", long_degrees, longFrac);
+		sprintf(Longitude_Buffer, "%f", long_degrees_value);
 
+}
+
+void get_Speed(const char* GPRMC_String, char* speed) {
+    float conversionFactor = 0.514444; // Conversion factor from knots to m/s
+		float speedInMetersPerSecond;
+	
+		uint8_t long_index = 0;
+    uint8_t index = 0;
+		uint8_t comma_count;
+	
+    for (comma_count = 0; GPRMC_String[index] != '\0'; index++) {
+        if (GPRMC_String[index] == ',') {
+            comma_count++;
+            if (comma_count == 7) {
+                index++;
+                break;
+            }
+        }
+    }
+    for (; GPRMC_String[index] != ',' && GPRMC_String[index] != '\0'; index++) {
+        speed[long_index] = GPRMC_String[index];
+        long_index++;
+    }
+    speedInKnots = atof(speed);
+    speedInMetersPerSecond = speedInKnots * conversionFactor;
+    
+		sprintf(speed, "%i", (int)speedInMetersPerSecond);
 }
 
 void get_Time(char*GPRMC_String,char*Time_Buffer)
@@ -129,7 +149,11 @@ void get_Time(char*GPRMC_String,char*Time_Buffer)
        
     }
     Time_value = atol(Time_Buffer);               /* convert string to integer */
-    hour = (Time_value / 10000);                  /* extract hour from integer */
+    hour = (Time_value / 10000) + 3;              /* extract hour from integer, aded 3Hrs for timezone*/
+		
+		if (hour >= 24)
+			hour -= 24;
+		
     min = (Time_value % 10000) / 100;             /* extract minute from integer */
     sec = (Time_value % 10000) % 100;             /* extract second from integer*/
 
@@ -161,3 +185,35 @@ bool checkValidity(char* buffer) {
 	
 	return false;
 }
+
+float calcDistance(char* lat1_str, char* lon1_str, char* lat2_str, char* lon2_str) {
+    float lat1 = atof(lat1_str);
+    float lon1 = atof(lon1_str);
+    float lat2 = atof(lat2_str);
+    float lon2 = atof(lon2_str);
+
+    float dLat = deg2rad(lat2 - lat1);
+    float dLon = deg2rad(lon2 - lon1);
+
+    float a = sin(dLat/2) * sin(dLat/2) +
+              cos(deg2rad(lat1)) * cos(deg2rad(lat2)) *
+              sin(dLon/2) * sin(dLon/2);
+    float c = 2 * atan2(sqrt(a), sqrt(1-a));
+    float distance = RADIUS * c;
+
+    return distance;
+}
+
+float calcDistance_float(float lat1, float lon1, float lat2, float lon2) {
+		float dLat = deg2rad(lat2 - lat1);
+    float dLon = deg2rad(lon2 - lon1);
+
+    float a = sin(dLat/2) * sin(dLat/2) +
+              cos(deg2rad(lat1)) * cos(deg2rad(lat2)) *
+              sin(dLon/2) * sin(dLon/2);
+    float c = 2 * atan2(sqrt(a), sqrt(1-a));
+    float distance = RADIUS * c;
+
+    return distance;
+}
+

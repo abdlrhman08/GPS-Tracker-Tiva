@@ -17,31 +17,29 @@ typedef enum {
 #endif /* UART_H */
 // if you want to use type(UART0_BASE,UART1_BASE,.....)
 
-void UartInitialize(uint32_t ui32Base)
+void UARTInitialize(uint32_t ui32Base, uint32_t ui32GPIOPort, uint8_t ui8GPIOPinRX, uint8_t ui8GPIOPinTX, int baudRate)
 {
-    // Enable the UART peripheral
-	uint32_t ui32Port = (ui32Base == UART0_BASE) ? GPIO_PORTA_BASE : GPIO_PORTB_BASE;
-    HWREG(SYSCTL_RCGCUART) |= (1 << ((ui32Base - UART0_BASE) / 0x1000));
+double CLDIV = 16000000.0 / (16.0 * baudRate);
+// Enable the UART peripheral
+HWREG(SYSCTL_RCGCUART) |= (1 << ((ui32Base - UART0_BASE) / 0x1000));
 
-    // Enable the GPIO port that is used for the UART pins
-	
-    
-    HWREG(SYSCTL_RCGCGPIO) |= (1 << ((ui32Base - UART0_BASE) / 0x1000));
-		while((SYSCTL_PRGPIO_R & (0x01 << ((ui32Base - UART0_BASE) / 0x1000))) == 0){}
+// Enable the GPIO port that is used for the UART pins
+HWREG(SYSCTL_RCGCGPIO) |= (1 << ((ui32GPIOPort - GPIO_PORTA_BASE) / 0x1000));
 
-    // Configure the UART pins
-    HWREG(ui32Port + GPIO_O_DEN) |= (GPIO_PIN_0 | GPIO_PIN_1);
-    HWREG(ui32Port + GPIO_O_PUR) |= GPIO_PIN_0;
-	HWREG(ui32Port + GPIO_O_PCTL) |= 0x11;
-    HWREG(ui32Base + UART_O_CTL) &= ~(UART_CTL_UARTEN);
-    HWREG(ui32Base + UART_O_CTL) |= UART_CTL_EOT;
-    HWREG(ui32Base + UART_O_CTL) &= ~(UART_CTL_LBE);
-    HWREG(ui32Base + UART_O_IBRD) = (int)CLDIV;
-    HWREG(ui32Base + UART_O_FBRD) = ((int)((((CLDIV) - ((int)(CLDIV))) * (64)) + (0.5)));
-    HWREG(ui32Base + UART_O_LCRH) = UART_LCRH_WLEN_8 ;
-    HWREG(ui32Base + UART_O_CTL) |= (UART_CTL_RXE | UART_CTL_TXE | UART_CTL_UARTEN);
-    HWREG(ui32Port + GPIO_O_AFSEL) |= (GPIO_PIN_0 | GPIO_PIN_1);
+// Configure the UART pins
+HWREG(ui32GPIOPort + GPIO_O_DEN) |= (1 << ui8GPIOPinRX) | (1 << ui8GPIOPinTX);
+HWREG(ui32GPIOPort + GPIO_O_PUR) |= (1 << ui8GPIOPinRX);
+HWREG(ui32GPIOPort + GPIO_O_PCTL) |= (1 << 4*ui8GPIOPinRX) | (1 << 4*ui8GPIOPinTX);
 
+// UART configuration
+HWREG(ui32Base + UART_O_CTL) &= ~(UART_CTL_UARTEN);
+HWREG(ui32Base + UART_O_CTL) |= UART_CTL_EOT;
+HWREG(ui32Base + UART_O_CTL) &= ~(UART_CTL_LBE);
+HWREG(ui32Base + UART_O_IBRD) = (int)CLDIV;
+HWREG(ui32Base + UART_O_FBRD) = ((int)((((CLDIV) - ((int)(CLDIV))) * (64)) + (0.5)));
+HWREG(ui32Base + UART_O_LCRH) = UART_LCRH_WLEN_8;
+HWREG(ui32Base + UART_O_CTL) |= (UART_CTL_RXE | UART_CTL_TXE | UART_CTL_UARTEN);
+HWREG(ui32GPIOPort + GPIO_O_AFSEL) |= (1 << ui8GPIOPinRX) | (1 << ui8GPIOPinTX);
 }
 
 char uartGetChar(uint32_t ui32Base)

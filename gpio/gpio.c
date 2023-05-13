@@ -1,6 +1,6 @@
 #include "gpio.h"
 
-void initPort(GPIO port) {
+void initPort(uint32_t port) {
 	uint8_t clock = 0x00;
 	
 	if (port == PortA) {
@@ -18,21 +18,27 @@ void initPort(GPIO port) {
 	}
 	
 	SYSCTL_RCGCGPIO_R |= clock;
-	while((SYSCTL_PRGPIO_R& (0x01 << 5)) == 0){}
+	while((SYSCTL_PRGPIO_R& (0x1 << 5)) == 0){}
 	
 	*((volatile unsigned long *)(GPIO_PORT_LOCK | port )) 		   = 0x4C4F434B;
-	*((volatile unsigned long *)(GPIO_PORT_COMMIT | port ))		 = 0xFF;
-	*((volatile unsigned long *)(GPIO_PORT_DEN | port )) 			 = 0x1E;
+	*((volatile unsigned long *)(GPIO_PORT_COMMIT | port ))		 = 0xFF;		
+	//Generally all ports will be used for digital usage
+	*((volatile unsigned long *)(GPIO_PORT_DEN | port )) 			 = 0xFF;
 		
-	//Defaulted on the pins on portF, a function later will be made for every pin
-	*((volatile unsigned long *)(GPIO_PORT_DIR | port)) 			 = 0x0E;
+	if (port == PortF) 
+		*((volatile unsigned long *)(GPIO_PORT_DIR | port)) 			 = 0x0E;
 }
 
-void pinHigh(GPIO port, uint8_t pin) {
+void pinOutput(uint32_t port, uint8_t pin) {
+	*((volatile unsigned long *)(GPIO_PORT_PDR | port)) |= 0x1 << pin;
+	*((volatile unsigned long *)(GPIO_PORT_DIR | port)) |= 0x1 << pin;
+}
+
+void pinHigh(uint32_t port, uint8_t pin) {
 	*((volatile unsigned long *)(GPIO_PORT_DATA | port)) |= 0x1 << pin;
 }
 
-void pinLow(GPIO port, uint8_t pin) {
+void pinLow(uint32_t port, uint8_t pin) {
 	*((volatile unsigned long *)(GPIO_PORT_DATA | port)) &= ~(0x1 << pin);
 }
 
