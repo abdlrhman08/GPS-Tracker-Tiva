@@ -29,5 +29,20 @@ This embedded module tracks your location using the gps module and parses all in
 |mahmoud osama mohmed abdelaal| 2101713| ECE|
 |shawky ahmed shawky |2002020 |CSE|
 |ahmed adel ali mashal| 2002296 |ECE |
+### Data flow
+```mermaid
+graph TD;
+    gbs-->Tiva;
+    Tiva-->lcd;
+    Tiva-->Arduino;
+    Arduino-->byzzer;
+    Tiva-->Wifi_module;
+    Wifi_module-->Server;
+    Server-->Wifi_module;
+    Application-->Server;
+    Server-->Application;
+    
+```
+
 
 
