@@ -37,12 +37,18 @@ graph TD;
     Tiva-->|finish pin6 1>>0 <br> and out of track pin 7 1>>0 |Arduino;
     Arduino-->buzzer;
     Tiva-->|AT Wifi commands|Wifi_module;
-    Wifi_module-->|custom made <br> Server commands|Server;
-    Server-->|response|Wifi_module;
-    Application-->|custom made <br> application commands|Server;
-    Server-->|response|Application;
+    Wifi_module-->|custom made <br> Server commands|TCP_Server;
+    TCP_Server-->|response|Wifi_module;
+    Application-->|custom made <br> application commands|TCP_Server;
+    TCP_Server-->|response|Application;
     
 ```
+[Server repo](https://github.com/abdlrhman08/GPS-Tracker-Server)
+
+
+|Command      | Description  | 
+| :--- | :--- |
+
 
 
 
