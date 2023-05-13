@@ -32,15 +32,15 @@ This embedded module tracks your location using the gps module and parses all in
 ### Data flow
 ```mermaid
 graph TD;
-    gps-->Tiva;
-    Tiva-->lcd;
-    Tiva-->Arduino;
+    gps-->|GPS Data|Tiva;
+    Tiva-->|string|lcd;
+    Tiva-->|finish pin6 1>>0 <br> and out of track pin 7 1>>0 |Arduino;
     Arduino-->buzzer;
-    Tiva-->Wifi_module;
-    Wifi_module-->Server;
-    Server-->Wifi_module;
-    Application-->Server;
-    Server-->Application;
+    Tiva-->|AT Wifi commands|Wifi_module;
+    Wifi_module-->|custom made <br> Server commands|Server;
+    Server-->|response|Wifi_module;
+    Application-->|custom made <br> application commands|Server;
+    Server-->|response|Application;
     
 ```
 
