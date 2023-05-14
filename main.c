@@ -15,24 +15,27 @@
 #include "gps/gps.h"
 #include "utils.h"
 
-#define SSID "dlink-B2BE"
-#define PASSWORD "aae4meJb@"
+#define SSID "Mashal"
+#define PASSWORD "mashal159s"
 
-#define DOMAIN "192.168.1.6"
-#define PORT 1280
+#define DOMAIN "5.tcp.eu.ngrok.io"
+#define PORT 19586
 
 char longitude[30];
 char latitude[30];
 char time[20];
 char speed[10];
 char buffer[120];
+char destinationBuffer[30];
+char destinationLat[10];
+char destinationLong[10];
+char data[40];
 
 char serverResponse;
 
 float prevLat, prevLong;
-float destinationLat, destinationLong;
 
-float accDistance, distance;
+float accDistance, distance, linearDistance;
 
 bool firstRead = true;
 
@@ -55,11 +58,6 @@ int main() {
 	
 	uartSendString(UART0_BASE, "Initialization started\r\n");
 	
-	sendGPSCommand(UART1_BASE, "PUBX,40,GLL,0,0,0,0");
-	sendGPSCommand(UART1_BASE, "PUBX,40,GSA,0,0,0,0");
-	sendGPSCommand(UART1_BASE, "PUBX,40,GSV,0,0,0,0");
-	sendGPSCommand(UART1_BASE, "PUBX,40,GGA,0,0,0,0");
-	sendGPSCommand(UART1_BASE, "PUBX,40,VTG,0,0,0,0");
 	delay_ms(500);
 	
 	if (ESP_Begin(UART3_BASE) && ESP_JoinAccessPoint(SSID, PASSWORD)) {
@@ -70,13 +68,24 @@ int main() {
 		}
 	}
 	
+	memset(destinationBuffer, 0, 30*sizeof(char));
+	
+	
+	sendGPSCommand(UART1_BASE, "PUBX,40,GLL,0,0,0,0");
+	sendGPSCommand(UART1_BASE, "PUBX,40,GSA,0,0,0,0");
+	sendGPSCommand(UART1_BASE, "PUBX,40,GSV,0,0,0,0");
+	sendGPSCommand(UART1_BASE, "PUBX,40,GGA,0,0,0,0");
+	sendGPSCommand(UART1_BASE, "PUBX,40,VTG,0,0,0,0");
+	
 	while(1) {
+		
 		memset(buffer, 0, 120*sizeof(char));
 		memset(longitude, 0, 30*sizeof(char));
 		memset(latitude, 0, 30*sizeof(char));
 		memset(speed, 0, 10*sizeof(char));
 		
 		uartGetString(UART1_BASE, buffer, '\n');
+		uartSendString(UART0_BASE, buffer);
 		
 		if (checkValidity(buffer)) {
 			
@@ -86,10 +95,23 @@ int main() {
 			get_Speed(buffer, speed);
 			
 			if (firstRead) {
+				linearDistance = calcDistance(latitude, longitude, destinationLat, destinationLong);
+				
 				prevLat = lat_degrees_value;
 				prevLong = long_degrees_value;
 				firstRead = false;
+				
+				if (ESP_SendAndGetResponse("dest", &serverResponse, 1)) {
+					if (serverResponse == '1') {
+						memset(data, 0, 40*sizeof(char));
+						sprintf(data, "%s,%s", latitude, longitude);
+						ESP_Send(data);
+				}
+	
 			}
+		}
+			
+		
 			distance = calcDistance_float(lat_degrees_value, long_degrees_value, prevLat, prevLong);
 			
 			if (distance > 1.5)
@@ -99,19 +121,25 @@ int main() {
 			prevLong = long_degrees_value;
 			
 		} else {
-			uartSendString(UART0_BASE, "Searching for satellites\r");
 			continue;
 		}
+		
+		if(ESP_SendAndGetResponse("gpsd", &serverResponse, 1) && serverResponse == '1') {
+			memset(data, 0, 40*sizeof(char));
+			sprintf(data, "%s,%s", latitude, longitude);
+			ESP_Send(data);
+		}
+		
 		
 		memset(buffer, 0, 120*sizeof(char));
 		sprintf(buffer, "Current time %s \r\nCurrent longitude %s \r\nCurrent latitude %s \r\nCurrent Speed %s \r\nDistance %f\r\n", time, longitude, latitude, speed, accDistance);
 		
-		uartSendString(UART0_BASE, buffer);
+		//uartSendString(UART0_BASE, buffer);
 		
-		if(ESP_SendAndGetResponse("gpsd", &serverResponse) && serverResponse == '1')
-			ESP_Send("alldata");
-		
+		pinHigh(PortF, GREEN_LED);
 		delay_ms(1000);
+		pinLow(PortF, GREEN_LED);
+		delay_ms(300);
 	}
 		
 	return 0;

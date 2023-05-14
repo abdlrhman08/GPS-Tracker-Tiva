@@ -17,6 +17,8 @@ float deg2rad(float deg);
 void delay_us(int t);
 void delay_ms(int t);
 
+void substr(char* src, int pos, int len, char* dest);
+
 void initSystick();
 
 #endif

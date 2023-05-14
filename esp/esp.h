@@ -66,7 +66,7 @@ bool ESP_Begin(uint32_t ui32Base);
 bool ESP_connectServer(const char* Domain,int Port);
 bool ESP_JoinAccessPoint(const char* _SSID, const char* _PASSWORD);
 bool ESP_Send(char* Data);
-bool ESP_SendAndGetResponse(char* Data, char* response);
+bool ESP_SendAndGetResponse(char* Data, char* response, int responseLength);
 
 uint8_t ESP_connected(uint32_t ui32Base);
 

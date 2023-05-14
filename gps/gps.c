@@ -10,7 +10,7 @@ void sendGPSCommand(uint32_t base, char* command) {
 	unsigned char checkSum = calculateChecksum(command);
 	
 	char newCommand[27];
-	sprintf(newCommand, "$%s*%X\r\n", command, checkSum);
+	sprintf(newCommand, "$%s*%02X\r\n", command, checkSum);
 	uartSendString(base, newCommand);
 }
 

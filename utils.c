@@ -27,6 +27,18 @@ unsigned char calculateChecksum(char* str) {
 	return (unsigned char)checkSumChar;
 }
 
+void substr(char* src, int pos, int len, char* dest) {
+	int i = 0;
+    
+  while (i < len) {
+		dest[i] = src[pos + i];
+    i++;
+  }
+    
+  dest[i] = 0;
+}
+
+
 float deg2rad(float deg) {
     return deg * (M_PI/180);
 }

@@ -10,6 +10,8 @@
 
 #include "../utils.h"
 
+#include "../uart/UART.h"
+
 #define RADIUS 6371000
 
 //To avoid multiple definitions
