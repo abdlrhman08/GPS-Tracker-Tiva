@@ -15,8 +15,8 @@ This embedded module tracks your location using the gps module and parses all in
 * 
 |case         | pin 6    |pin 7  | song number |
 | --- | --- | --- | --- |
-|normal       |  1       |  1    |[ song 1  ](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/131257593/dc533af5-15f0-44e5-ad75-5462614586d0)    |
-|out of track |  1       |  0    | song 2      |
+|normal       |  1       |  1    |[ song 1  ](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/89034348/8d0e7e9b-3f33-4e29-b987-f7ab8c413f91)    |
+|out of track |  1       |  0    | [song 2](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/89034348/8d0e7e9b-3f33-4e29-b987-f7ab8c413f91)     |
 |finish       |  0       |  1    | song 3      |
 |impossible   |  0       |  0    | Off     |
 ## Contributors
