@@ -114,7 +114,7 @@ LCD_CMD(clear_display);
 			LCD_String("linear distance :" );
 	    LCD_String(lineardist );
 	    LCD_String(" m"); 
-			delay_milli(10000);
+			delay_milli(1000);
 
    // latitude speed and longitude
       LCD_CMD(clear_display);
@@ -132,6 +132,6 @@ LCD_CMD(clear_display);
 			delay_milli(15);
 			LCD_String("Log = ");
 			LCD_String(longitude);
-			delay_milli(100);
+			delay_milli(1000);
 }
 
