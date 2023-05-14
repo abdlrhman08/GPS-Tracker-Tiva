@@ -50,13 +50,13 @@ typedef enum {
 #define UART7_RX_PIN 0
 #define UART7_TX_PIN 1n 7
 
-void UartGetString(uint32_t ui32Base, char *pcStr, uint8_t ui8StopChar);
+void uartGetString(uint32_t ui32Base, char *pcStr, uint8_t ui8StopChar);
+void uartGetString_useLen(uint32_t ui32Base, char *pcStr, uint8_t bufferLEN);
+
 void uartSendChar(uint32_t ui32Base, char c);
 void uartSendString(uint32_t ui32Base, const char* pcStr);
 char uartGetChar(uint32_t ui32Base);
 void UARTInitialize(uint32_t ui32Base, uint32_t ui32GPIOPort, uint8_t ui8GPIOPinRX, uint8_t ui8GPIOPinTX, int baudRate);
-void oneMilliSecond(uint32_t ms);
-void hundredMicroSecounds(void);
 bool UARTCharsAvail(uint32_t ui32Base);
 uint32_t UARTCharGetNonBlocking(uint32_t ui32Base, char *pcData);
 

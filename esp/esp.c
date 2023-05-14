@@ -4,38 +4,12 @@
 
 #include "esp.h"
 
+unsigned int WIFI_UART_BASE;
+
 int8_t Response_Status;
 volatile int16_t Counter = 0, pointer = 0;
 uint32_t TimeOut = 0;
 char RESPONSE_BUFFER[DEFAULT_BUFFER_SIZE];
-
-bool GetResponse(uint32_t ui32Base, char* Response, uint16_t ResponseLength) {
-    uint16_t len = 0;
-    uint32_t ui32Status = 0;
-
-    while (len < ResponseLength - 1) {
-        ui32Status = UARTCharGetNonBlocking(ui32Base,Response);
-        if (ui32Status == UART_ERROR) {
-            return false;
-        }
-        else if (ui32Status == 0) {
-            continue;
-        }
-        else {
-            Response[len++] = ui32Status;
-            if (Response[len - 1] == '\n') {
-                Response[len] = 0;
-                break;
-            }
-        }
-    }
-
-    if (len >= MAX_RESPONSE_LEN) {
-        Response[MAX_RESPONSE_LEN - 1] = 0;
-    }
-
-    return true;
-}
 
 bool SendATCommand(uint32_t ui32Base, char *pcCmd)
 {
@@ -50,52 +24,6 @@ bool SendATCommand(uint32_t ui32Base, char *pcCmd)
     return true; // Return success
 }
 
-void Read_Response(char* _Expected_Response)
-{
-    uint32_t EXPECTED_RESPONSE_LENGTH = strlen(_Expected_Response);
-    uint32_t TimeCount = 0, ResponseBufferLength;
-    char RECEIVED_CRLF_BUF[30];
-
-    while(1)
-    {
-        if(TimeCount >= (DEFAULT_TIMEOUT+TimeOut))
-        {
-            TimeOut = 0;
-            Response_Status = ESP_RESPONSE_TIMEOUT;
-            return;
-        }
-
-        if(Response_Status == ESP_RESPONSE_STARTING)
-        {
-            Response_Status = ESP_RESPONSE_WAITING;
-        }
-
-        ResponseBufferLength = strlen(RESPONSE_BUFFER);
-        if (ResponseBufferLength)
-        {
-            oneMilliSecond(1);
-            TimeCount++;
-            if (ResponseBufferLength==strlen(RESPONSE_BUFFER))
-            {
-								uint32_t i;
-                for (i=0;i<ResponseBufferLength;i++)
-                {
-                    memmove(RECEIVED_CRLF_BUF, RECEIVED_CRLF_BUF + 1, EXPECTED_RESPONSE_LENGTH-1);
-                    RECEIVED_CRLF_BUF[EXPECTED_RESPONSE_LENGTH-1] = RESPONSE_BUFFER[i];
-                    if(!strncmp(RECEIVED_CRLF_BUF, _Expected_Response, EXPECTED_RESPONSE_LENGTH))
-                    {
-                        TimeOut = 0;
-                        Response_Status = ESP_RESPONSE_FINISHED;
-                        return;
-                    }
-                }
-            }
-        }
-        oneMilliSecond(1);
-        TimeCount++;
-    }
-}
-
 void ESP_Clear()
 {
     memset(RESPONSE_BUFFER,0,DEFAULT_BUFFER_SIZE);
@@ -105,9 +33,9 @@ void ESP_Clear()
 void Start_Read_Response(char* _ExpectedResponse)
 {
     Response_Status = ESP_RESPONSE_STARTING;
-    do {
-        Read_Response(_ExpectedResponse);
-    } while(Response_Status == ESP_RESPONSE_WAITING);
+   // do {
+   //     Read_Response(_ExpectedResponse);
+   // } while(Response_Status == ESP_RESPONSE_WAITING);
 
 }
 
@@ -166,13 +94,23 @@ bool ESP_ConnectionMode(uint32_t ui32Base,uint8_t Mode)
 
 bool ESP_Begin(uint32_t ui32Base)
 {
-		uint8_t i;
-    for (i=0;i<5;i++)
-    {
-        if(SendATandExpectResponse(ui32Base,"ATE0","\r\nOK\r\n")||SendATandExpectResponse(ui32Base,"AT","\r\nOK\r\n"))
-            return true;
-    }
-    return false;
+	char response[20];
+	memset(response, 0, 20*sizeof(char));
+	
+	WIFI_UART_BASE = ui32Base;
+	delay_ms(100);
+	
+		uartSendString(WIFI_UART_BASE, "ATE0\r\n");
+		delay_ms(200);
+		uartGetString_useLen(WIFI_UART_BASE, response, strlen("\r\nOK\r\n"));
+		delay_ms(100);
+	uartSendString(UART0_BASE, response);
+	
+	
+	if (response[2] == 'O' && response[3] == 'K')
+		return true;
+	
+	return false;
 }
 
 bool ESP_Close(uint32_t ui32Base)
@@ -204,26 +142,24 @@ bool ESP_WIFIMode(uint32_t ui32Base, uint32_t mode)
     return true;
 }
 
-uint8_t ESP_JoinAccessPoint(uint32_t ui32Base, const char* _SSID, const char* _PASSWORD)
+bool ESP_JoinAccessPoint(const char* _SSID, const char* _PASSWORD)
 {
     char _atCommand[60];
+		char response[70];
     memset(_atCommand, 0, 60);
-    sprintf(_atCommand, "AT+CWJAP=\"%s\",\"%s\"", _SSID, _PASSWORD);
-    _atCommand[59] = 0;
-    if(SendATandExpectResponse(ui32Base,_atCommand, "\r\nWIFI CONNECTED\r\n"))
-        return ESP_WIFI_CONNECTED;
-    else{
-        if(strstr(RESPONSE_BUFFER, "+CWJAP:1"))
-            return ESP_CONNECTION_TIMEOUT;
-        else if(strstr(RESPONSE_BUFFER, "+CWJAP:2"))
-            return ESP_WRONG_PASSWORD;
-        else if(strstr(RESPONSE_BUFFER, "+CWJAP:3"))
-            return ESP_NOT_FOUND_TARGET_AP;
-        else if(strstr(RESPONSE_BUFFER, "+CWJAP:4"))
-            return ESP_CONNECTION_FAILED;
-        else
-            return ESP_JOIN_UNKNOWN_ERROR;
-    }
+    sprintf(_atCommand, "AT+CWJAP=\"%s\",\"%s\"\r\n", _SSID, _PASSWORD);
+	
+		uartSendString(WIFI_UART_BASE, _atCommand);
+		delay_ms(300);
+		uartGetString_useLen(WIFI_UART_BASE, response, 51);
+		delay_ms(200);
+		
+		LOG(response);
+	
+		if (response[47] == 'O' && response[48] == 'K')
+			return true;
+	
+	return false;
 }
 
 uint8_t ESP_connected(uint32_t ui32Base)
@@ -241,42 +177,62 @@ uint8_t ESP_connected(uint32_t ui32Base)
         return ESP_CONNECT_UNKNOWN_ERROR;
 }
 
-uint8_t ESP_Start(uint32_t ui32Base,uint8_t _ConnectionNumber, const char* Domain, const char* Port)
+bool ESP_connectServer(const char* Domain, int Port)
 {
-    bool _startResponse;
-    char _atCommand[60];
-    memset(_atCommand, 0, 60);
-    _atCommand[59] = 0;
+    char _atCommand[100];
+		char response[20];
+    memset(_atCommand, 0, 100*sizeof(char));
+		memset(response, 0, 60*sizeof(char));
 
-    if(SendATandExpectResponse(ui32Base,"AT+CIPMUX?", "CIPMUX:0"))
-        sprintf(_atCommand, "AT+CIPSTART=\"TCP\",\"%s\",%s", Domain, Port);
-    else
-        sprintf(_atCommand, "AT+CIPSTART=\"%d\",\"TCP\",\"%s\",%s", _ConnectionNumber, Domain, Port);
-
-    _startResponse = SendATandExpectResponse(ui32Base,_atCommand, "CONNECT\r\n");
-    if(!_startResponse)
-    {
-        if(Response_Status == ESP_RESPONSE_TIMEOUT)
-            return ESP_RESPONSE_TIMEOUT;
-        return ESP_RESPONSE_ERROR;
-    }
-    return ESP_RESPONSE_FINISHED;
+   
+    sprintf(_atCommand, "AT+CIPSTART=\"TCP\",\"%s\",%i\r\n", Domain, Port);
+		uartSendString(WIFI_UART_BASE, _atCommand);
+		delay_ms(200);
+		uartGetString_useLen(WIFI_UART_BASE, response , 15);
+		LOG(response);
+	 
+    if (response[11] == 'O' && response[12] == 'K')
+			return true;
+		
+		return false;
 }
 
-uint8_t ESP_Send(uint32_t ui32Base,char* Data)
+bool ESP_SendAndGetResponse(char* Data, char* response)
 {
-    char _atCommand[20];
-    memset(_atCommand, 0, 20);
-    sprintf(_atCommand, "AT+CIPSEND=%d", (strlen(Data)+2));
-    _atCommand[19] = 0;
-    SendATandExpectResponse(ui32Base,_atCommand, "\r\nOK\r\n>");
-    if(!SendATandExpectResponse(ui32Base,Data, "\r\nSEND OK\r\n"))
-    {
-        if(Response_Status == ESP_RESPONSE_TIMEOUT)
-            return ESP_RESPONSE_TIMEOUT;
-        return ESP_RESPONSE_ERROR;
-    }
-    return ESP_RESPONSE_FINISHED;
+	memset(RESPONSE_BUFFER, 0, 50*sizeof(char));
+	if (ESP_Send(Data)) {
+		delay_ms(100);
+		uartGetString_useLen(WIFI_UART_BASE, RESPONSE_BUFFER, strlen("+IPD1:1\r\n")+1);
+		
+		*response = RESPONSE_BUFFER[7];
+		return true;
+	}
+	return false;
+}
+
+bool ESP_Send(char* Data)
+{
+    char _atCommand[256];
+		char response[50];
+	
+		memset(response, 0, 50*sizeof(char));
+    memset(_atCommand, 0, 256*sizeof(char));
+    sprintf(_atCommand, "AT+CIPSEND=%d\r\n", strlen(Data));
+		uartSendString(WIFI_UART_BASE, _atCommand);
+		delay_ms(200);
+	
+		uartGetString_useLen(WIFI_UART_BASE, response, strlen("OK\r\n>\r\n"));
+		delay_ms(100);
+		if (response[6] == '>')
+			uartSendString(WIFI_UART_BASE, Data);
+		memset(response, 0, 50*sizeof(char));
+		uartGetString_useLen(WIFI_UART_BASE, response, strlen("\r\nRecv n bytes\r\n\r\nSEND OK\r\n") + 1);
+		
+		LOG(response);
+		if (response[24] == 'O' && response[25] == 'K')
+			return true;
+	
+	return false;
 }
 
 int16_t ESP_DataAvailable()
@@ -297,7 +253,7 @@ uint8_t ESP_DataRead()
 uint16_t Read_Data(char* _buffer)
 {
     uint16_t len = 0;
-    oneMilliSecond(100);
+    delay_ms(100);
     while(ESP_DataAvailable() > 0)
         _buffer[len++] = ESP_DataRead();
     return len;

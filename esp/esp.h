@@ -10,34 +10,14 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "../uart/UART.h"
-
-
-#define DEFAULT_BUFFER_SIZE		160
-#define DEFAULT_TIMEOUT			10000
-#define MAX_RESPONSE_LEN 256
-/* Connection Mode */
-#define SINGLE				0
-#define MULTIPLE			1
-
-/* Application Mode */
-#define NORMAL				0
-#define TRANSPERANT			1
-
-/* Application Mode */
-#define STATION				1
-#define ACCESSPOINT			2
-#define BOTH_STATION_AND_ACCESPOINT	3
+#include "../utils.h"
 
 /* Select Demo */
 #define RECEIVE_DEMO			/* Define RECEIVE demo */
 //#define SEND_DEMO			/* Define SEND demo */
+#define DEFAULT_BUFFER_SIZE 50
 
-/* Define Required fields shown below */
-#define DOMAIN				"api.thingspeak.com"
-#define PORT				"80"
-
-#define SSID				"ssid"
-#define PASSWORD			"password"
+extern unsigned int WIFI_UART_BASE;
 
 enum ESP_RESPONSE_STATUS{
     ESP_RESPONSE_WAITING,
@@ -80,12 +60,16 @@ bool WaitForExpectedResponse(char* ExpectedResponse);
 bool SendATandExpectResponse(uint32_t ui32Base,char* ATCommand, char* ExpectedResponse);
 bool ESP_ApplicationMode(uint32_t ui32Base,uint8_t Mode);
 bool ESP_ConnectionMode(uint32_t ui32Base,uint8_t Mode);
-bool ESP_Begin(uint32_t ui32Base);
 bool ESP_Close(uint32_t ui32Base);
-uint8_t ESP_JoinAccessPoint(uint32_t ui32Base, const char* _SSID, const char* _PASSWORD);
+
+bool ESP_Begin(uint32_t ui32Base);
+bool ESP_connectServer(const char* Domain,int Port);
+bool ESP_JoinAccessPoint(const char* _SSID, const char* _PASSWORD);
+bool ESP_Send(char* Data);
+bool ESP_SendAndGetResponse(char* Data, char* response);
+
 uint8_t ESP_connected(uint32_t ui32Base);
-uint8_t ESP_Start(uint32_t ui32Base,uint8_t _ConnectionNumber, const char* Domain, const char* Port);
-uint8_t ESP_Send(uint32_t ui32Base,char* Data);
+
 int16_t ESP_DataAvailable();
 uint8_t ESP_DataRead();
 uint16_t Read_Data(char* _buffer);

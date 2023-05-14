@@ -1,0 +1,6 @@
+[submodule "Server"]
+	path = Server
+	url = git@github.com:abdlrhman08/GPS-Tracker-Server.git
+[submodule "Application"]
+	path = Application
+	url = https://github.com/zainmo11/GPS-Application-.git

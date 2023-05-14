@@ -37,7 +37,7 @@ HWREG(ui32Base + UART_O_CTL) |= UART_CTL_EOT;
 HWREG(ui32Base + UART_O_CTL) &= ~(UART_CTL_LBE);
 HWREG(ui32Base + UART_O_IBRD) = (int)CLDIV;
 HWREG(ui32Base + UART_O_FBRD) = ((int)((((CLDIV) - ((int)(CLDIV))) * (64)) + (0.5)));
-HWREG(ui32Base + UART_O_LCRH) = UART_LCRH_WLEN_8;
+HWREG(ui32Base + UART_O_LCRH) = 0x70;
 HWREG(ui32Base + UART_O_CTL) |= (UART_CTL_RXE | UART_CTL_TXE | UART_CTL_UARTEN);
 HWREG(ui32GPIOPort + GPIO_O_AFSEL) |= (1 << ui8GPIOPinRX) | (1 << ui8GPIOPinTX);
 }
@@ -55,7 +55,7 @@ char uartGetChar(uint32_t ui32Base)
     return c;
 }
 
-void UartGetString(uint32_t ui32Base, char *pcStr, uint8_t ui8StopChar)
+void uartGetString(uint32_t ui32Base, char *pcStr, uint8_t ui8StopChar)
 {
     uint32_t ui32Count = 0;
     char cChar;
@@ -83,6 +83,18 @@ void UartGetString(uint32_t ui32Base, char *pcStr, uint8_t ui8StopChar)
     pcStr[ui32Count] = '\0';
 }
 
+void uartGetString_useLen(uint32_t ui32Base, char *pcStr, uint8_t bufferLEN) {
+	int counter = 0;
+	
+	while (counter < bufferLEN) {
+		pcStr[counter++] = uartGetChar(ui32Base);
+	}
+	
+	pcStr[bufferLEN] = 0;
+
+}
+
+
 void uartSendChar(uint32_t ui32Base, char c) {
     // Wait until there is space available in the transmit FIFO
     while (HWREG(ui32Base + UART_O_FR) & UART_FR_TXFF);
@@ -104,12 +116,10 @@ void uartSendString(uint32_t ui32Base, const char* pcStr) {
 
 bool UARTCharsAvail(uint32_t ui32Base)
 {
-    // Get the number of bytes available in the receive FIFO
-    uint32_t ui32BytesAvailable = UARTCharsAvail(ui32Base);
-
-    // Return true if at least one byte is available, false otherwise
-    return (ui32BytesAvailable > 0);
+    // Check if there is at least one byte available in the receive FIFO
+    return (HWREG(ui32Base + UART_O_FR) & UART_FR_RXFE) == 0;
 }
+
 uint32_t UARTCharGetNonBlocking(uint32_t ui32Base, char *pcData)
 {
     // Check if there is data in the receive FIFO
@@ -125,19 +135,3 @@ uint32_t UARTCharGetNonBlocking(uint32_t ui32Base, char *pcData)
         return UART_ERROR;
     }
 }
-void hundredMicroSecounds(void)
-{
-    NVIC_ST_CTRL_R = NVIC_ST_CTRL_R & ~(0x00000001); //disable Timer
-    NVIC_ST_RELOAD_R = (1600000 - 1); 		//to make 1 secound as our Tiva has clk = 16 MHZ
-    NVIC_ST_CURRENT_R = 0; 				//to clear counter value and underflow flag of counter
-    NVIC_ST_CTRL_R |= 0x5; 				//to put at source clk 1 to get PROCESOR CLK NOT its 8th only and enable Timer
-};
-void oneMilliSecond(uint32_t ms)
-{
-    uint32_t delay_cycles = 16000 * ms; //16000 cycles = 1 millisecond
-    NVIC_ST_CTRL_R = NVIC_ST_CTRL_R & ~(0x00000001); //disable Timer
-    NVIC_ST_RELOAD_R = (delay_cycles - 1); //set the delay value
-    NVIC_ST_CURRENT_R = 0; //reset the counter
-    NVIC_ST_CTRL_R |= 0x5; //enable and start the Timer
-    while((NVIC_ST_CTRL_R & 0x00010000) == 0); //wait for Timer to finish
-};

@@ -482,6 +482,21 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>esp</GroupName>
+          <Files>
+            <File>
+              <FileName>esp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\esp\esp.c</FilePath>
+            </File>
+            <File>
+              <FileName>esp.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\esp\esp.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
   </Targets>
