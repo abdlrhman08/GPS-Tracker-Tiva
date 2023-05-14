@@ -25,7 +25,7 @@ This embedded module tracks your location using the gps module and parses all in
 | :--- | :---: | :---: |
 |Nassar khaled mesoud | 2001464 | CSE|
 |abdelrahman atef saad hamada |2101645| CSE|
-|abdelrahman zain mohmed |2101645| CSE|
+|abdelrahman zain mohmed |2101646| CSE|
 |mahmoud osama mohmed abdelaal| 2101713| ECE|
 |shawky ahmed shawky |2002020 |CSE|
 |ahmed adel ali mashal| 2002296 |ECE |
