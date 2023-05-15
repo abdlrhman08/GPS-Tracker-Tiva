@@ -1,4 +1,4 @@
-# GPS Tracker using Tiva TM4c123 GXL(accumulative work of 500 hours)
+# GPS Tracker Tiva TM4c123 GXL(accumulative work of 500 hours)
 
 This embedded module tracks your location using the gps module and parses all information it can from the NMEA Message, like time, date and location. Sends the information to a JAVA server and the server then sends it to an application which show the position of the TIVA,
 
