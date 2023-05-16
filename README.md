@@ -53,6 +53,10 @@ graph TD;
 
 ## 3-Wifi module
 ---
+### the linking point between Tiva and Server
+
+|Command      | Description  | 
+| :--- | :--- |
 
 ## 4-LCD
 ---
@@ -100,14 +104,14 @@ graph TD;
 
 
 
+## end
+### we brain stormed many ideas learnt about many things ,struggled ,we proved to our selves that we could push our limits ,believe in each other . 
+![giphy (3)](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/131257593/72f0d4b5-ffb6-4a89-afe1-4b3ec1d637f1)
 
 
 
 
-## GPS commands
 
-|Command      | Description  | 
-| :--- | :--- |
 
 
 
