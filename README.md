@@ -7,18 +7,12 @@ This embedded module tracks your location using the gps module and parses all in
 * ## LCD :arrow_right: displays the time ,speed and location 
 * ## Java Server 
 * ## Wifi module :arrow_right: makes connection wireless with pc
-* ## Application :arrow_right: diplays same LCD info on pc ![image](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/131257593/f4245fdb-e9ab-42b1-b034-9010bcd61ede)
+* ## Application :arrow_right: diplays same LCD info on pc 
 
 
 * ### arduino mega + speaker >> treats pin 6 and 7 as the leds of TIVA so the speaker produces different songs in different situations
 
-* 
-|case         | pin 6    |pin 7  | song number |
-| --- | --- | --- | --- |
-|normal       |  1       |  1    |[ song 1  ](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/89034348/8d0e7e9b-3f33-4e29-b987-f7ab8c413f91)    |
-|out of track |  1       |  0    | [song 2](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/89034348/8d0e7e9b-3f33-4e29-b987-f7ab8c413f91)     |
-|finish       |  0       |  1    | [song 3](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/89034348/43420f24-f454-4257-99c2-2e1e415663c0)      |
-|impossible   |  0       |  0    | Off     |
+
 ## Contributors
 
 |Name        | code    |Department  | 
@@ -45,7 +39,21 @@ graph TD;
 ```
 [Server repo](https://github.com/abdlrhman08/GPS-Tracker-Server)
 
-## identification commands
+## 1-Tiva
+---
+
+|Name      | Description  | 
+| :--- | :--- |
+|UART | the brain of the project ,its drivers where a big problem to handle ,We didnt write a usual one , especially our uart driver in which we avoided the reduduncy and made one function |
+
+
+## 2-GPS module
+
+## 3-Wifi module
+
+## 4-LCD
+
+## 5-TCP Server
 
 |Command      | Description  | 
 | :--- | :--- |
@@ -55,6 +63,30 @@ graph TD;
 ||After the server receives the identification message it will assign a thread to the client and start the lifecycle loop and wait for commands|
 ||This commands the server first checks if it is sent by the app or the tiva, if it is the send by the app it sends a one byte message '1'. <br> This message tells the client that it is waiting for a response. Here the application should send to the application the destination point where you want the Tiva to go|
 ||If the command was send by Tiva it will respond with the same one byte message and it will wait for the Tiva to respond with its starting point. <br> After that, the Server will reply to the tiva with the destination point which the app sent first|
+
+
+## 6-.net Application
+![image](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/131257593/f4245fdb-e9ab-42b1-b034-9010bcd61ede)
+
+## 7-Arduino with Speaker
+
+|case         | pin 6    |pin 7  | song number |
+| --- | --- | --- | --- |
+|normal       |  1       |  1    |[ song 1  ](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/89034348/8d0e7e9b-3f33-4e29-b987-f7ab8c413f91)    |
+|out of track |  1       |  0    | [song 2](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/89034348/8d0e7e9b-3f33-4e29-b987-f7ab8c413f91)     |
+|finish       |  0       |  1    | [song 3](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/89034348/43420f24-f454-4257-99c2-2e1e415663c0)      |
+|impossible   |  0       |  0    | Off     |
+
+## 8-power circuit and power bank  to feed all the devices
+### switches and regulator to feed the wifi module with 3.3v and lcd with 5 v
+
+## 9-Beautiful packaging
+
+
+
+
+
+
 
 
 ## GPS commands
