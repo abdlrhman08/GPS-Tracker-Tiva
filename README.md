@@ -92,7 +92,7 @@ graph TD;
 ---
 ### switches and regulator to feed the wifi module with 3.3v and lcd with 5 v otherwise it will cause flames
 ---
-!![giphy (1)](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/131257593/e565da97-66d3-4c92-8c82-3e38234f75bc){:width="300px" height="200px"}
+!![giphy (1)](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/131257593/e565da97-66d3-4c92-8c82-3e38234f75bc)
 
 
 
