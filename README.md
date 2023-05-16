@@ -49,6 +49,7 @@ graph TD;
 
 ## 2-GPS module
 ---
+#we forced the GPS to send data in RMS form and extracted the speed and time from it to be displayed on 
 
 ## 3-Wifi module
 ---
