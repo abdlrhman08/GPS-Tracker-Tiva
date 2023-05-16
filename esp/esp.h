@@ -15,9 +15,12 @@
 /* Select Demo */
 #define RECEIVE_DEMO			/* Define RECEIVE demo */
 //#define SEND_DEMO			/* Define SEND demo */
-#define DEFAULT_BUFFER_SIZE 50
+#define SERVER_RESPONSE_END 1278
 
 extern unsigned int WIFI_UART_BASE;
+
+extern char temp[256];
+extern char y;
 
 enum ESP_RESPONSE_STATUS{
     ESP_RESPONSE_WAITING,
@@ -48,7 +51,7 @@ enum ESP_JOINAP_STATUS {
 extern int8_t Response_Status;
 extern volatile int16_t Counter, pointer;
 extern uint32_t TimeOut;
-extern char RESPONSE_BUFFER[DEFAULT_BUFFER_SIZE];
+extern char RESPONSE_BUFFER[100];
 
 bool GetResponse(uint32_t ui32Base, char* Response, uint16_t ResponseLength);
 bool SendATCommand(uint32_t ui32Base, char *pcCmd);
@@ -67,6 +70,7 @@ bool ESP_connectServer(const char* Domain,int Port);
 bool ESP_JoinAccessPoint(const char* _SSID, const char* _PASSWORD);
 bool ESP_Send(char* Data);
 bool ESP_SendAndGetResponse(char* Data, char* response, int responseLength);
+bool ESP_GetResponse(char* response,int start, int responseLength);
 
 uint8_t ESP_connected(uint32_t ui32Base);
 
