@@ -12,6 +12,8 @@
 #include "needed_files/hw_sysctl.h"
 #include "needed_files/hw_types.h"
 
+#include "../utils.h"
+
 typedef enum {
     UART_OK = 1,
     UART_ERROR = 0
@@ -48,13 +50,16 @@ typedef enum {
 
 // UART7
 #define UART7_RX_PIN 0
-#define UART7_TX_PIN 1n 7
+#define UART7_TX_PIN 1
 
 void uartGetString(uint32_t ui32Base, char *pcStr, uint8_t ui8StopChar);
 void uartGetString_useLen(uint32_t ui32Base, char *pcStr, uint8_t bufferLEN);
 
 void uartSendChar(uint32_t ui32Base, char c);
 void uartSendString(uint32_t ui32Base, const char* pcStr);
+
+void uartFlushAndDebug(uint32_t ui32Base);
+
 char uartGetChar(uint32_t ui32Base);
 void UARTInitialize(uint32_t ui32Base, uint32_t ui32GPIOPort, uint8_t ui8GPIOPinRX, uint8_t ui8GPIOPinTX, int baudRate);
 bool UARTCharsAvail(uint32_t ui32Base);

@@ -21,7 +21,7 @@
 
 #define RED_LED 1
 #define GREEN_LED 3
-#define BLUE_LED 1
+#define BLUE_LED 2
 
 void initPort(uint32_t port);
 

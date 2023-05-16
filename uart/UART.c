@@ -50,10 +50,18 @@ char uartGetChar(uint32_t ui32Base)
     while(((HWREG(ui32Base + UART_O_FR) & UART_FR_RXFE)) != 0);
 
     // Read the received character
-    c = HWREG(ui32Base + UART_O_DR) & 0xFF;
+    c = HWREG(ui32Base + UART_O_DR);
 
     return c;
 }
+void uartFlushAndDebug(uint32_t ui32Base) {
+    volatile uint32_t trash; // Add volatile keyword for correct memory access
+ // Explicit typecasting
+
+    while (!(HWREG(ui32Base + UART_O_FR) & UART_FR_RXFE)) { // Explicit typecasting
+        trash = (uint32_t)HWREG(ui32Base + UART_O_DR); // Explicit typecasting
+    }
+	}
 
 void uartGetString(uint32_t ui32Base, char *pcStr, uint8_t ui8StopChar)
 {
