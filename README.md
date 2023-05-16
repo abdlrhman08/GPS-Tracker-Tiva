@@ -63,15 +63,13 @@ graph TD;
 
 ## 5-TCP Server
 ---
+When the client is first connected to the server, the server waits for.a 4 byte message to identify themself|
 
 |Command      | Description  | 
 | :--- | :--- |
-| |When the client is first connected to the server, the server waits for.a 4 byte message to identify themself|
-||tiva: This message is sent by the Wi-Fi module of the Tiva, so the server understands that it will later send the destination point to it|
-||appl: This message is sent by the application, the server will know that it will be the one who assigns the destination point|
-||After the server receives the identification message it will assign a thread to the client and start the lifecycle loop and wait for commands|
-||This commands the server first checks if it is sent by the app or the tiva, if it is the send by the app it sends a one byte message '1'. <br> This message tells the client that it is waiting for a response. Here the application should send to the application the destination point where you want the Tiva to go|
-||If the command was send by Tiva it will respond with the same one byte message and it will wait for the Tiva to respond with its starting point. <br> After that, the Server will reply to the tiva with the destination point which the app sent first|
+|tiva| This message is sent by the Wi-Fi module of the Tiva, so the server understands that it will later send the destination point to it|
+|appl| This message is sent by the application, the server will know that it will be the one who assigns the destination point After the server receives the identification message it will assign a thread to the client and start the lifecycle loop and wait for commands|
+|dest |This commands the server first checks if it is sent by the app or the tiva, if it is the send by the app it sends a one byte message '1'. <br> This message tells the client that it is waiting for a response. Here the application should send to the application the destination point where you want the Tiva to go. If the command was send by Tiva it will respond with the same one byte message and it will wait for the Tiva to respond with its starting point. <br> After that, the Server will reply to the tiva with the destination point which the app sent first|
 
 
 ## 6-.net Application
