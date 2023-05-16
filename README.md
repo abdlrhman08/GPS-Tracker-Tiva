@@ -48,12 +48,16 @@ graph TD;
 
 
 ## 2-GPS module
+---
 
 ## 3-Wifi module
+---
 
 ## 4-LCD
+---
 
 ## 5-TCP Server
+---
 
 |Command      | Description  | 
 | :--- | :--- |
@@ -66,21 +70,31 @@ graph TD;
 
 
 ## 6-.net Application
+---
 ![image](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/131257593/f4245fdb-e9ab-42b1-b034-9010bcd61ede)
 
 ## 7-Arduino with Speaker
+---
 
-|case         | pin 6    |pin 7  | song number |
-| --- | --- | --- | --- |
-|normal       |  1       |  1    |[ song 1  ](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/89034348/8d0e7e9b-3f33-4e29-b987-f7ab8c413f91)    |
-|out of track |  1       |  0    | [song 2](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/89034348/8d0e7e9b-3f33-4e29-b987-f7ab8c413f91)     |
-|finish       |  0       |  1    | [song 3](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/89034348/43420f24-f454-4257-99c2-2e1e415663c0)      |
+|case         | pin 6    |pin 7  | song number |                       |
+| --- | --- | --- | --- | --- |
+|normal       |  1       |  1    |[ song 1  ](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/89034348/8d0e7e9b-3f33-4e29-b987-f7ab8c413f91)    |![giphy (2)](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/131257593/07f6a393-fa97-422e-a28b-fdc6d36afd5f)|
+|out of track |  1       |  0    | [song 2](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/89034348/8d0e7e9b-3f33-4e29-b987-f7ab8c413f91)     |&nbsp;|
+|finish       |  0       |  1    | [song 3](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/89034348/43420f24-f454-4257-99c2-2e1e415663c0)      ||
 |impossible   |  0       |  0    | Off     |
 
 ## 8-power circuit and power bank  to feed all the devices
-### switches and regulator to feed the wifi module with 3.3v and lcd with 5 v
+---
+### switches and regulator to feed the wifi module with 3.3v and lcd with 5 v otherwise it will cause flames
+---
+!![giphy (1)](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/131257593/e565da97-66d3-4c92-8c82-3e38234f75bc){:width="300px" height="200px"}
+
+
+
 
 ## 9-Beautiful packaging
+---
+![WhatsApp Image 2023-05-16 at 8 32 44 PM](https://github.com/abdlrhman08/GPS-Tracker-Tiva/assets/131257593/16fd0259-254d-4765-8510-5cd551af4f7d)
 
 
 
