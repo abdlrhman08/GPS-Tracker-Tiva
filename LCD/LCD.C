@@ -5,17 +5,17 @@
 typedef char * string;
 
 /*The LCD initializes 
-the ports A5-6-7 as the control pins  for LCD and portB0-7 
+the ports A5-6-7 as the control pins  for LCD and portD0-7 
 as the data pins*/
 void LCD_INIT(void) {
 		SET(SYSCTL_RCGCGPIO_R,1);
 		while((SYSCTL_PRGPIO_R& (0x01 << 1)) == 0){}
     
-    GPIO_PORTB_AFSEL_R &= ~0xff;    //disable alternative functions for portB
-    GPIO_PORTB_AMSEL_R &= ~0Xff;    //disable analogue function
-    GPIO_PORTB_PCTL_R &= ~0XFF;     //regular digital pins
-    GPIO_PORTB_DIR_R  |= 0XFF;      //set the direction of PB0-7 as output
-    GPIO_PORTB_DEN_R  |= 0XFF;      //enable digital portB
+    GPIO_PORTD_AFSEL_R &= ~0xff;    //disable alternative functions for portB
+    GPIO_PORTD_AMSEL_R &= ~0Xff;    //disable analogue function
+    GPIO_PORTD_PCTL_R &= ~0XFF;     //regular digital pins
+    GPIO_PORTD_DIR_R  |= 0XFF;      //set the direction of PD0-7 as output
+    GPIO_PORTD_DEN_R  |= 0XFF;      //enable digital portD
 
 	
 		// PA5 >> r/w, PA6 >> EN, PA7 >> RS
@@ -29,7 +29,7 @@ void LCD_INIT(void) {
 }
 
 void LCD_CMD(unsigned long cmd) {
-    GPIO_PORTB_DATA_R = cmd;    //set PB7-0 as the passed command to the function
+    GPIO_PORTD_DATA_R = cmd;    //set PD7-0 as the passed command to the function
     LCD_RS = 0x00;  						//set PA7 register select pin to low
     LCD_RW = 0x00;  						//set PA5 r/w pin to low
     LCD_EN = 0x40;  						//set enable pin to high
@@ -38,13 +38,23 @@ void LCD_CMD(unsigned long cmd) {
 }
 
 void LCD_WRITE (char data ) {
-    GPIO_PORTB_DATA_R = data;  //write the data to PB7-0
+    GPIO_PORTD_DATA_R = data;  //write the data to PB7-0
     LCD_RS = 0x80;  					 //set PA7 to high
     LCD_RW = 0x00;  					 //set pA5 to low
     LCD_EN = 0x40;  					 //set the enable pin high
     delay_micro(40);       					 //short delay 
     LCD_EN = 0x00;  					 //set the enable pin to low
 }
+
+//LCD_CMD();
+// LCD_WRITE("speed :");
+// LCD_WRITE (speed);
+//LCD_CMD();
+//LCD_WRITE("time :");
+//LCD_WRITE(time );
+//delay_milli()
+//lcd clear 
+//LCD_CMD();
 
 void SysTick_Wait_Timer(int delay)
 {
